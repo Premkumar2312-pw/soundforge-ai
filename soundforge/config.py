@@ -3,9 +3,11 @@ Configuration settings for SoundForge AI
 """
 
 from typing import Optional
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     APP_ENV: str = "production"
@@ -28,9 +30,5 @@ class Settings(BaseSettings):
     
     # Logging
     LOG_LEVEL: str = "INFO"
-    
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
 
 settings = Settings()

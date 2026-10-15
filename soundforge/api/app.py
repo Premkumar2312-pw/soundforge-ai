@@ -2,6 +2,7 @@
 FastAPI Application Entrypoint for SoundForge AI
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -12,9 +13,15 @@ from soundforge.api.ui import DEMO_HTML
 from soundforge.config import settings
 from soundforge.utils.logging import logger
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("SoundForge AI service started", extra={"version": __version__, "env": settings.APP_ENV})
+    yield
+    logger.info("SoundForge AI service shutting down")
+
 app = FastAPI(
     title="SoundForge AI - Background Music Engine for Video",
-    description="""
+    description=r"""
 # SoundForge AI REST API (PS1 Specification)
 
 Professional AI Background Music Engine for Video, conforming to Problem Statement PS1 specifications.
@@ -32,7 +39,8 @@ Professional AI Background Music Engine for Video, conforming to Problem Stateme
     version=__version__,
     openapi_version="3.1.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # CORS Middleware
@@ -52,11 +60,3 @@ app.include_router(router)
 async def serve_demonstration_ui():
     """Serves the interactive web demonstration interface."""
     return HTMLResponse(content=DEMO_HTML)
-
-@app.on_event("startup")
-async def on_startup():
-    logger.info("SoundForge AI service started", extra={"version": __version__, "env": settings.APP_ENV})
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    logger.info("SoundForge AI service shutting down")

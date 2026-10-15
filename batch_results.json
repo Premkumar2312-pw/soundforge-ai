@@ -1,0 +1,62 @@
+[
+  {
+    "id": "TC-01",
+    "description": "Standard Corporate Tech Tutorial",
+    "target_duration_s": 6.0,
+    "actual_duration_s": 6.0,
+    "target_lufs": -14.0,
+    "measured_lufs": -14.08,
+    "true_peak_dbtp": -1.0,
+    "max_recon_error": 0.0,
+    "execution_time_s": 0.59,
+    "status": "PASS"
+  },
+  {
+    "id": "TC-02",
+    "description": "Lo-Fi Study Beat (Seamless Loop)",
+    "target_duration_s": 8.0,
+    "actual_duration_s": 8.0,
+    "target_lufs": -14.0,
+    "measured_lufs": -14.02,
+    "true_peak_dbtp": -1.0,
+    "max_recon_error": 0.0,
+    "execution_time_s": 0.65,
+    "status": "PASS"
+  },
+  {
+    "id": "TC-03",
+    "description": "Cinematic Build-Up with Custom Sections",
+    "target_duration_s": 10.0,
+    "actual_duration_s": 10.0,
+    "target_lufs": -14.0,
+    "measured_lufs": -14.1,
+    "true_peak_dbtp": -1.0,
+    "max_recon_error": 0.0,
+    "execution_time_s": 0.91,
+    "status": "PASS"
+  },
+  {
+    "id": "TC-04",
+    "description": "Synthwave Retro Groove with Broadcast Loudness",
+    "target_duration_s": 5.0,
+    "actual_duration_s": 5.0,
+    "target_lufs": -16.0,
+    "measured_lufs": -16.0,
+    "true_peak_dbtp": -1.05,
+    "max_recon_error": 0.0,
+    "execution_time_s": 0.5,
+    "status": "PASS"
+  },
+  {
+    "id": "TC-05",
+    "description": "Short Sting / Ident (3.0 seconds)",
+    "target_duration_s": 3.0,
+    "actual_duration_s": 3.0,
+    "target_lufs": -14.0,
+    "measured_lufs": -14.09,
+    "true_peak_dbtp": -1.0,
+    "max_recon_error": 0.0,
+    "execution_time_s": 0.52,
+    "status": "PASS"
+  }
+]
