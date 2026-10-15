@@ -260,9 +260,9 @@ DEMO_HTML = """<!DOCTYPE html>
                 </div>
 
                 <div class="form-group">
-                    <label>Duration (Seconds)</label>
+                    <label>Duration (Seconds) • 5s to 300s</label>
                     <div class="slider-row">
-                        <input type="range" id="durationSlider" min="3" max="60" value="12" step="1" oninput="durationVal.innerText = this.value + 's'">
+                        <input type="range" id="durationSlider" min="5" max="300" value="12" step="1" oninput="durationVal.innerText = this.value + 's'">
                         <span class="slider-val" id="durationVal">12s</span>
                     </div>
                 </div>
@@ -276,10 +276,10 @@ DEMO_HTML = """<!DOCTYPE html>
                 </div>
 
                 <div class="form-group">
-                    <label>Target Integrated Loudness (LUFS)</label>
+                    <label>Target Integrated Loudness (LUFS) • Default -16 LUFS</label>
                     <div class="slider-row">
-                        <input type="range" id="lufsSlider" min="-24" max="-8" value="-14" step="1" oninput="lufsVal.innerText = this.value + ' LUFS'">
-                        <span class="slider-val" id="lufsVal">-14 LUFS</span>
+                        <input type="range" id="lufsSlider" min="-24" max="-8" value="-16" step="1" oninput="lufsVal.innerText = this.value + ' LUFS'">
+                        <span class="slider-val" id="lufsVal">-16 LUFS</span>
                     </div>
                 </div>
 

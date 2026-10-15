@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   soundforge-api:
     build:
@@ -15,7 +13,7 @@ services:
       - STORAGE_BACKEND=local
       - STORAGE_DIR=/app/storage
       - DEFAULT_SAMPLE_RATE=48000
-      - DEFAULT_TARGET_LOUDNESS=-14.0
+      - DEFAULT_TARGET_LOUDNESS=-16.0
       - LOG_LEVEL=INFO
     volumes:
       - ./storage:/app/storage

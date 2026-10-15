@@ -1,8 +1,8 @@
 {
   "manifest_version": "1.0.0",
   "job_id": "02_lofi_chill_loop",
-  "created_at": "2026-10-15T12:02:55Z",
-  "completed_at": "2026-10-15T12:02:55.628581+00:00",
+  "created_at": "2026-10-15T12:59:09Z",
+  "completed_at": "2026-10-15T12:59:09.180589+00:00",
   "status": "completed",
   "request_parameters": {
     "prompt": "Chill lo-fi study beat with mellow electric piano and warm bassline",
@@ -72,7 +72,7 @@
   },
   "reconstruction_verification": {
     "formula": "Mix = Sum(Stem_i * Gain_i)",
-    "max_reconstruction_error": 0.0,
+    "max_reconstruction_error": 3.9935111995070827e-07,
     "perfect_reconstruction_verified": true
   },
   "audio_metrics": {
@@ -81,11 +81,11 @@
     "channel_layout": "Stereo",
     "bit_depth": "24-bit PCM",
     "actual_duration_seconds": 16.0,
-    "target_loudness_lufs": -14.0,
-    "measured_loudness_lufs": -14.15,
-    "true_peak_dbtp": -1.0,
+    "target_loudness_lufs": -16.0,
+    "measured_loudness_lufs": -16.0,
+    "true_peak_dbtp": -1.33,
     "max_true_peak_limit_dbtp": -1.0,
-    "mastering_gain_applied_db": -3.4
+    "mastering_gain_applied_db": -4.8
   },
   "ducking": {
     "ducking_applied": false,
@@ -106,15 +106,15 @@
     }
   },
   "timings_ms": {
-    "generation_time_ms": 1035.68,
-    "mixing_time_ms": 47.81,
-    "mastering_time_ms": 149.2,
+    "generation_time_ms": 1170.69,
+    "mixing_time_ms": 43.48,
+    "mastering_time_ms": 178.09,
     "ducking_time_ms": 0.0,
-    "total_pipeline_time_ms": 1579.82
+    "total_pipeline_time_ms": 2059.66
   },
   "cost_estimates": {
-    "compute_time_ms": 1579.82,
-    "estimated_cost_usd": 7.9e-05,
+    "compute_time_ms": 2059.66,
+    "estimated_cost_usd": 0.000103,
     "currency": "USD"
   },
   "artifacts": {

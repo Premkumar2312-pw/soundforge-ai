@@ -103,8 +103,8 @@ def build_manifest(
             "channel_layout": "Stereo",
             "bit_depth": "24-bit PCM",
             "actual_duration_seconds": round(actual_duration, 4),
-            "target_loudness_lufs": mastering_report.get("target_loudness_lufs", -14.0),
-            "measured_loudness_lufs": mastering_report.get("final_loudness_lufs", -14.0),
+            "target_loudness_lufs": mastering_report.get("target_loudness_lufs", -16.0),
+            "measured_loudness_lufs": mastering_report.get("final_loudness_lufs", -16.0),
             "true_peak_dbtp": mastering_report.get("final_true_peak_dbtp", -1.0),
             "max_true_peak_limit_dbtp": mastering_report.get("max_true_peak_limit_dbtp", -1.0),
             "mastering_gain_applied_db": mastering_report.get("gain_applied_db", 0.0)

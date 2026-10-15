@@ -22,7 +22,7 @@ class MusicalSection(BaseModel):
 
 class MusicJobRequest(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=1000, description="Natural language description of desired music")
-    duration: float = Field(..., gt=0.0, le=600.0, description="Exact duration in seconds (1.0 to 600.0s)")
+    duration: float = Field(..., ge=5.0, le=300.0, description="Exact duration in seconds (5.0 to 300.0s)")
     sections: Optional[List[MusicalSection]] = Field(None, description="Optional custom musical sections")
     tempo: Optional[float] = Field(None, ge=40.0, le=240.0, description="Tempo in beats per minute (BPM)")
     key: Optional[str] = Field(None, description="Musical key/tonality, e.g. 'C_major', 'A_minor', 'G_major'")
@@ -30,7 +30,7 @@ class MusicJobRequest(BaseModel):
     narration_url: Optional[str] = Field(None, description="URL or filepath to narration audio for automatic sidechain ducking")
     seed: Optional[int] = Field(None, description="Random seed for reproducible generation")
     sample_rate: int = Field(48000, description="Audio sample rate in Hz (default 48000)")
-    target_loudness: float = Field(-14.0, ge=-36.0, le=-6.0, description="Target integrated loudness in LUFS (default -14.0 LUFS)")
+    target_loudness: float = Field(-16.0, ge=-36.0, le=-6.0, description="Target integrated loudness in LUFS (default -16.0 LUFS)")
     output_formats: List[str] = Field(default_factory=lambda: ["wav"], description="Requested audio formats: ['wav', 'mp3']")
     callback_url: Optional[str] = Field(None, description="Webhook URL notified upon job completion")
 
@@ -58,6 +58,7 @@ class MusicJobResponse(BaseModel):
     created_at: str
     estimated_duration_seconds: float
     idempotency_key: Optional[str] = None
+    correlation_id: Optional[str] = None
 
 class JobStatusResponse(BaseModel):
     job_id: str
@@ -70,6 +71,7 @@ class JobStatusResponse(BaseModel):
     error: Optional[str] = None
     artifacts: Optional[Dict[str, str]] = None
     manifest: Optional[Dict[str, Any]] = None
+    correlation_id: Optional[str] = None
 
 class HealthResponse(BaseModel):
     status: str

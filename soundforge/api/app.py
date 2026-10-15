@@ -43,6 +43,17 @@ Professional AI Background Music Engine for Video, conforming to Problem Stateme
     lifespan=lifespan
 )
 
+import uuid
+from starlette.requests import Request
+
+@app.middleware("http")
+async def correlation_id_middleware(request: Request, call_next):
+    corr_id = request.headers.get("X-Correlation-ID") or request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    request.state.correlation_id = corr_id
+    response = await call_next(request)
+    response.headers["X-Correlation-ID"] = corr_id
+    return response
+
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,

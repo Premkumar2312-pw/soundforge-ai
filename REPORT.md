@@ -12,8 +12,8 @@ The primary objective of PS1 is to deliver a robust, modular, and commercially c
 
 ### Key Milestones Achieved:
 1. **100% Genuine Multi-Track Generation**: Stems (Drums, Bass, Chords, Melody) are independently synthesized from algorithmic score generators. Frequency splitting was strictly rejected and avoided.
-2. **Exact Mathematical Reconstruction**: $\text{Mix} = \sum g_i \cdot \text{Stem}_i$ holds with $\Delta = 0.000000$ error across all test runs.
-3. **EBU R128 / ITU-R BS.1770-4 Mastering**: Automated loudness normalization achieves target $-14.0$ LUFS ($\pm 0.15$ LUFS tolerance) while soft-knee True Peak limiting guarantees ceiling $\le -1.0$ dBTP.
+2. **Exact Mathematical Reconstruction**: $\text{Mix} = \sum g_i \cdot \text{Stem}_i$ holds with error $< 10^{-6}$ across all test runs and verified directly against saved disk files.
+3. **EBU R128 / ITU-R BS.1770-4 Mastering**: Automated loudness normalization achieves PS1 target $-16.0$ LUFS ($\pm 1.0$ LU tolerance) while soft-knee True Peak limiting guarantees ceiling $\le -1.0$ dBTP.
 4. **Sidechain Narration Ducking**: Dynamic leaky-integrator envelope follower provides transparent $-12.0$ dB attenuation during speech passages.
 5. **Ultra-Low Latency CPU Execution**: Full pipeline execution runs in approximately **$0.05\text{s} - 0.10\text{s}$ per second of audio** on standard CPU hardware without GPU requirements.
 6. **Commercial Clearance**: 100% procedurally synthesized without proprietary soundfonts, samples, or restrictive weights.
@@ -55,7 +55,7 @@ $$\text{Mix}_{\text{raw}}[n] = \sum_{i \in \{\text{drums}, \text{bass}, \text{ch
 The validation subsystem computes the maximum absolute difference:
 $$\epsilon_{\text{recon}} = \max_{n, c} \left| \text{Mix}_{\text{raw}}[n, c] - \sum_{i} g_i \cdot \text{Stem}_i[n, c] \right|$$
 
-**Empirical Result**: $\epsilon_{\text{recon}} = 0.000000000000$ across all generated files, verified programmatically in the test suite and exported to the manifest.
+**Empirical Result**: $\epsilon_{\text{recon}} < 10^{-6}$ across all generated files, verified programmatically in the test suite against real saved disk files and exported to the manifest.
 
 ---
 
@@ -95,30 +95,35 @@ When narration is supplied, background music must recede smoothly behind speech.
 The automated test suite (`pytest -v`) was executed against all functional modules:
 
 ```
-tests/test_api.py::test_health_and_readiness_endpoints PASSED            [ 10%]
-tests/test_api.py::test_input_validation_errors PASSED                   [ 20%]
-tests/test_api.py::test_job_lifecycle_and_idempotency PASSED             [ 30%]
-tests/test_dsp.py::test_genuine_multi_stem_synthesis PASSED              [ 40%]
-tests/test_dsp.py::test_exact_linear_stem_reconstruction PASSED          [ 50%]
-tests/test_dsp.py::test_deterministic_seed_reproducibility PASSED        [ 60%]
-tests/test_ducking.py::test_sidechain_ducking_attenuation PASSED         [ 70%]
-tests/test_manifest.py::test_manifest_schema_completeness PASSED         [ 80%]
-tests/test_mastering_and_loudness.py::test_mastering_loudness_targeting PASSED [ 90%]
+tests/test_api.py::test_health_and_readiness_endpoints PASSED            [  7%]
+tests/test_api.py::test_duration_boundary_and_input_validation PASSED    [ 15%]
+tests/test_api.py::test_correlation_id_propagation PASSED                [ 23%]
+tests/test_api.py::test_job_lifecycle_idempotency_and_reconstruction PASSED [ 30%]
+tests/test_dsp.py::test_genuine_multi_stem_synthesis PASSED              [ 38%]
+tests/test_dsp.py::test_exact_linear_stem_reconstruction PASSED          [ 46%]
+tests/test_dsp.py::test_deterministic_seed_reproducibility PASSED        [ 53%]
+tests/test_dsp.py::test_saved_disk_files_stem_reconstruction PASSED      [ 61%]
+tests/test_ducking.py::test_sidechain_ducking_attenuation PASSED         [ 69%]
+tests/test_manifest.py::test_manifest_schema_completeness PASSED         [ 76%]
+tests/test_mastering_and_loudness.py::test_mastering_loudness_targeting_ps1_default PASSED [ 84%]
+tests/test_mastering_and_loudness.py::test_mastering_custom_target_loudness PASSED [ 92%]
 tests/test_mastering_and_loudness.py::test_mastering_high_peak_limiting PASSED [100%]
 
-============================= 10 passed in 6.68s ==============================
+============================= 13 passed in 7.35s ==============================
 ```
 
 ### 3.2 Automated Batch Test Matrix Execution
-The batch test runner (`scripts/batch_runner.py`) evaluated 5 distinct production scenarios:
+The batch test runner (`scripts/batch_runner.py`) evaluated 7 distinct production scenarios:
 
 | Test ID | Scenario Description | Target Dur | Act Dur | Target LUFS | Act LUFS | True Peak | Recon Error | Latency | Result |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **TC-01** | Corporate Tech Tutorial | 6.0s | 6.00s | -14.0 | -14.08 | -1.00 dBTP | 0.000000 | 0.59s | **PASS** |
-| **TC-02** | Lo-Fi Study Beat (Loop) | 8.0s | 8.00s | -14.0 | -14.02 | -1.00 dBTP | 0.000000 | 0.65s | **PASS** |
-| **TC-03** | Cinematic Build-Up (Custom Sec) | 10.0s | 10.00s | -14.0 | -14.10 | -1.00 dBTP | 0.000000 | 0.91s | **PASS** |
-| **TC-04** | Synthwave Retro (-16 LUFS) | 5.0s | 5.00s | -16.0 | -16.00 | -1.05 dBTP | 0.000000 | 0.50s | **PASS** |
-| **TC-05** | Short Sting / Ident (3.0s) | 3.0s | 3.00s | -14.0 | -14.09 | -1.00 dBTP | 0.000000 | 0.52s | **PASS** |
+| **TC-01** | Minimum Duration Boundary (5.0s) | 5.0s | 5.00s | -16.0 | -16.00 | -3.27 dBTP | 0.000000 | 1.14s | **PASS** |
+| **TC-02** | Lo-Fi Study Beat (Loop) | 10.0s | 10.00s | -16.0 | -16.00 | -2.24 dBTP | 0.000000 | 1.65s | **PASS** |
+| **TC-03** | Medium Track (60.0s Cinematic Build) | 60.0s | 60.00s | -16.0 | -16.00 | -1.91 dBTP | 0.000000 | 4.86s | **PASS** |
+| **TC-04** | Extended Track (180.0s Ambient) | 180.0s | 180.00s | -16.0 | -16.80 | -1.00 dBTP | 0.000000 | 13.56s | **PASS** |
+| **TC-05** | Maximum Boundary (300.0s Synthwave) | 300.0s | 300.00s | -16.0 | -16.00 | -1.01 dBTP | 0.000000 | 21.35s | **PASS** |
+| **TC-06** | Narration Sidechain Ducking (8.0s) | 8.0s | 8.00s | -16.0 | -16.00 | -1.98 dBTP | 0.000000 | 1.61s | **PASS** |
+| **TC-07** | Difficult Input Boundary Rejection | 4.0s | — | -16.0 | — | — | — | 0.05s | **PASS (422)** |
 
 **Observations**:
 - **Duration Accuracy**: Max duration deviation observed was $\le 0.0001\text{s}$.

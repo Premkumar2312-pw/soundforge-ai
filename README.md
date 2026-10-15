@@ -4,7 +4,7 @@
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Commercial Clearance](https://img.shields.io/badge/Commercial_Clearance-100%25_Verified-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/Tests-10%2F10_Passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-13%2F13_Passing-brightgreen.svg)]()
 
 **SoundForge AI** is an enterprise-grade AI Background Music Engine built for the **IncuBrix Software Engineer Assessment (Problem Statement PS1)**. It provides automated, high-fidelity background music generation tailored for video creators, editors, podcasts, and automated media pipelines.
 
@@ -14,8 +14,8 @@
 
 - **Asynchronous Background Job Pipeline**: Submissions return `HTTP 202 Accepted` immediately with a unique `job_id`, real-time stage progress polling (`0.0` to `1.0`), and idempotent execution via `Idempotency-Key` headers.
 - **Genuine Multi-Track Instrument Stems**: Zero frequency-splitting policy! Stems (Drums, Bass, Chords/Harmony, Melody/Lead) are synthesized independently from generative score logic, eliminating acoustic phase artifacts and bleed.
-- **Exact Mathematical Mix Reconstruction**: Master mixes linearly reconstruct from stems using documented gains ($Mix = \sum g_i \cdot Stem_i$), mathematically verified with zero error ($0.0$).
-- **Loudness & True Peak Mastering**: Automated mastering adhering to **ITU-R BS.1770-4 / EBU R128** loudness targeting (default `-14.0` LUFS) and soft-knee True Peak limiting strictly maintaining inter-sample headroom ($\le -1.0$ dBTP).
+- **Exact Mathematical Mix Reconstruction**: Master mixes linearly reconstruct from saved disk stems using documented manifest gains ($Mix = \sum g_i \cdot Stem_i$), mathematically verified with error $< 10^{-6}$.
+- **Loudness & True Peak Mastering**: Automated mastering adhering to **ITU-R BS.1770-4 / EBU R128** loudness targeting (PS1 default `-16.0` LUFS, $\pm 1.0$ LU tolerance) and soft-knee True Peak limiting strictly maintaining inter-sample headroom ($\le -1.0$ dBTP).
 - **Sidechain Narration Ducking**: Envelope-follower sidechain compression automatically attenuates instrumental audio by `-12.0` dB during dialogue passages without pumping.
 - **Comprehensive PS1 Manifest**: Accompanies every job with complete musical settings, structural sections, beat/bar grids, stem gains, true peak/LUFS metrics, compute cost estimates, execution timings, and licensing provenance.
 - **100% Cleared Commercial Rights**: 100% procedural DSP synthesis. Zero proprietary soundfonts, copyrighted sample packs, or non-commercial model weights.
@@ -125,7 +125,7 @@ The service will automatically start on port `8000` with continuous healthcheck 
   "key": "C_major",
   "loopability": false,
   "sample_rate": 48000,
-  "target_loudness": -14.0,
+  "target_loudness": -16.0,
   "output_formats": ["wav", "mp3"],
   "seed": 42
 }
@@ -187,19 +187,21 @@ Execute the automated test suite across diverse musical prompts, durations, and 
 python scripts/batch_runner.py
 ```
 
-Sample output:
+Actual verified execution results across test cases:
 ```
-================================================================================
- BATCH RUN SUMMARY TABLE
-================================================================================
-ID      | Status | Target Dur | Act Dur  | Target LUFS | Act LUFS  | Peak dBTP | Recon Err  | Time(s)
---------------------------------------------------------------------------------------------
-TC-01   | PASS   | 6.0        | 6.00     | -14.0       | -14.08    | -1.00     | 0.000000   | 0.59   
-TC-02   | PASS   | 8.0        | 8.00     | -14.0       | -14.02    | -1.00     | 0.000000   | 0.65   
-TC-03   | PASS   | 10.0       | 10.00    | -14.0       | -14.10    | -1.00     | 0.000000   | 0.91   
-TC-04   | PASS   | 5.0        | 5.00     | -16.0       | -16.00    | -1.05     | 0.000000   | 0.50   
-TC-05   | PASS   | 3.0        | 3.00     | -14.0       | -14.09    | -1.00     | 0.000000   | 0.52   
-================================================================================
+===============================================================================================
+ PS1 BATCH TEST EXECUTION SUMMARY
+===============================================================================================
+ID      | Status           | Target Dur | Act Dur  | Target LUFS | Act LUFS  | Peak dBTP | Recon Err  | Time(s)
+---------------------------------------------------------------------------------------------------------
+TC-01   | PASS             | 5.0        | 5.00     | -16.0       | -16.00    | -3.27     | 0.000000   | 1.14   
+TC-02   | PASS             | 10.0       | 10.00    | -16.0       | -16.00    | -2.24     | 0.000000   | 1.65   
+TC-03   | PASS             | 60.0       | 60.00    | -16.0       | -16.00    | -1.91     | 0.000000   | 4.86   
+TC-04   | PASS             | 180.0      | 180.00   | -16.0       | -16.80    | -1.00     | 0.000000   | 13.56  
+TC-05   | PASS             | 300.0      | 300.00   | -16.0       | -16.00    | -1.01     | 0.000000   | 21.35  
+TC-06   | PASS             | 8.0        | 8.00     | -16.0       | -16.00    | -1.98     | 0.000000   | 1.61   
+TC-07   | PASS (Rejected 422) | 4.0        | 0.00     | -16.0       | 0.00      | 0.00      | 0.000000   | 0.05   
+===============================================================================================
 ```
 
 ---
@@ -207,9 +209,9 @@ TC-05   | PASS   | 3.0        | 3.00     | -14.0       | -14.09    | -1.00     |
 ## Running Automated Tests
 
 ```powershell
-pytest -v
+python -m pytest tests/ -v
 ```
-All 10 test suites covering DSP stem generation, mathematical reconstruction, EBU R128 loudness targeting, True Peak limiting, sidechain ducking, API routes, and idempotency will execute.
+All 13 automated unit and integration tests covering DSP multi-stem generation, exact mathematical disk reconstruction, EBU R128 loudness targeting (-16.0 LUFS), True Peak limiting, sidechain ducking, API routes, and idempotency will execute cleanly.
 
 ---
 
@@ -234,6 +236,8 @@ soundforge-ai/
 ├── Dockerfile           # Multi-stage production container
 ├── docker-compose.yml   # Multi-container orchestration
 ├── requirements.txt     # Locked production dependencies
+├── LOCAL_SETUP.md       # Windows local developer runbook & troubleshooting
+├── AUDIT_REPORT.md      # PS1 compliance audit report & verification evidence
 ├── PLAN.md              # Technical design & phased roadmap
 ├── REPORT.md            # Technical engineering evaluation report
 ├── SOURCES.md           # Component licensing & provenance audit

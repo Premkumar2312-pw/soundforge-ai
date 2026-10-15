@@ -1,5 +1,5 @@
 """
-Configuration settings for SoundForge AI
+Configuration settings for SoundForge AI (PS1 Specification)
 """
 
 from typing import Optional
@@ -21,12 +21,14 @@ class Settings(BaseSettings):
     S3_BUCKET_NAME: str = "soundforge-audio"
     S3_REGION: str = "us-east-1"
     
-    # Audio settings
+    # Audio settings (PS1 Specification)
     DEFAULT_SAMPLE_RATE: int = 48000
-    DEFAULT_TARGET_LOUDNESS: float = -14.0
+    DEFAULT_TARGET_LOUDNESS: float = -16.0
     MAX_TRUE_PEAK_DBTP: float = -1.0
-    MAX_DURATION_SECONDS: float = 600.0
-    MIN_DURATION_SECONDS: float = 1.0
+    MIN_DURATION_SECONDS: float = 5.0
+    MAX_DURATION_SECONDS: float = 300.0
+    DURATION_TOLERANCE_SECONDS: float = 0.05
+    LOUDNESS_TOLERANCE_LU: float = 1.0
     
     # Logging
     LOG_LEVEL: str = "INFO"

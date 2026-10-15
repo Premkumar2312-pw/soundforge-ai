@@ -336,6 +336,10 @@ class ProceduralSynthesizer:
                     stem[-fade_len:, 0] *= fade_curve
                     stem[-fade_len:, 1] *= fade_curve
                     
+        # Controlled stem saturation for dynamic range & headroom consistency
+        for s_arr in [stem_drums, stem_bass, stem_chords, stem_melody]:
+            s_arr[:] = np.tanh(s_arr * 1.5) * 0.72
+
         return {
             "drums": stem_drums,
             "bass": stem_bass,

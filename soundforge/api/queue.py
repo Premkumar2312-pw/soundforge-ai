@@ -15,9 +15,10 @@ from soundforge.storage import get_storage_provider
 from soundforge.utils.logging import logger
 
 class JobState:
-    def __init__(self, job_id: str, request: MusicJobRequest):
+    def __init__(self, job_id: str, request: MusicJobRequest, correlation_id: Optional[str] = None):
         self.job_id = job_id
         self.request = request
+        self.correlation_id = correlation_id
         self.status = JobStatus.PENDING
         self.progress = 0.0
         self.current_stage = "Job received"
@@ -34,8 +35,8 @@ class JobManager:
         self._lock = asyncio.Lock()
         self.storage = get_storage_provider()
 
-    def create_job(self, job_id: str, request: MusicJobRequest) -> JobState:
-        state = JobState(job_id, request)
+    def create_job(self, job_id: str, request: MusicJobRequest, correlation_id: Optional[str] = None) -> JobState:
+        state = JobState(job_id, request, correlation_id)
         self._jobs[job_id] = state
         return state
 

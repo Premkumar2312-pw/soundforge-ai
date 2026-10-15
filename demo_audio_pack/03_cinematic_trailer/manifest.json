@@ -1,8 +1,8 @@
 {
   "manifest_version": "1.0.0",
   "job_id": "03_cinematic_trailer",
-  "created_at": "2026-10-15T12:02:56Z",
-  "completed_at": "2026-10-15T12:02:56.750877+00:00",
+  "created_at": "2026-10-15T12:59:10Z",
+  "completed_at": "2026-10-15T12:59:10.488598+00:00",
   "status": "completed",
   "request_parameters": {
     "prompt": "Cinematic dramatic trailer intro with rising tension and pounding drums",
@@ -64,7 +64,7 @@
   },
   "reconstruction_verification": {
     "formula": "Mix = Sum(Stem_i * Gain_i)",
-    "max_reconstruction_error": 0.0,
+    "max_reconstruction_error": 3.6954879767403526e-07,
     "perfect_reconstruction_verified": true
   },
   "audio_metrics": {
@@ -73,11 +73,11 @@
     "channel_layout": "Stereo",
     "bit_depth": "24-bit PCM",
     "actual_duration_seconds": 14.0,
-    "target_loudness_lufs": -14.0,
-    "measured_loudness_lufs": -14.12,
-    "true_peak_dbtp": -1.0,
+    "target_loudness_lufs": -16.0,
+    "measured_loudness_lufs": -16.0,
+    "true_peak_dbtp": -1.36,
     "max_true_peak_limit_dbtp": -1.0,
-    "mastering_gain_applied_db": -3.12
+    "mastering_gain_applied_db": -4.59
   },
   "ducking": {
     "ducking_applied": false,
@@ -98,15 +98,15 @@
     }
   },
   "timings_ms": {
-    "generation_time_ms": 653.53,
-    "mixing_time_ms": 35.1,
-    "mastering_time_ms": 126.5,
+    "generation_time_ms": 651.75,
+    "mixing_time_ms": 36.89,
+    "mastering_time_ms": 124.03,
     "ducking_time_ms": 0.0,
-    "total_pipeline_time_ms": 1116.49
+    "total_pipeline_time_ms": 1301.49
   },
   "cost_estimates": {
-    "compute_time_ms": 1116.49,
-    "estimated_cost_usd": 5.6e-05,
+    "compute_time_ms": 1301.49,
+    "estimated_cost_usd": 6.5e-05,
     "currency": "USD"
   },
   "artifacts": {

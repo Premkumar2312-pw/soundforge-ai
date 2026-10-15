@@ -9,10 +9,21 @@ env/
 .venv/
 ENV/
 
+# Environment variables & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+credentials.json
+
 # Output audio and artifacts
 storage/
 output/
 test_output/
+poc_output/
+temp_test/
 *.wav
 *.mp3
 !tests/fixtures/*.wav

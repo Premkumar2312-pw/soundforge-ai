@@ -75,18 +75,20 @@ async def execute_generation_pipeline(
     # 3. Linear Stem Mixing
     update_progress(0.50, "Performing linear stem mix and reconstruction verification")
     t0 = time.perf_counter()
-    raw_mix, max_recon_error = mix_stems(stems, DEFAULT_STEM_GAINS)
+    raw_mix, _ = mix_stems(stems, DEFAULT_STEM_GAINS)
     timings["mixing_time_ms"] = round((time.perf_counter() - t0) * 1000, 2)
     
     # 4. Mastering & Loudness Normalization
     update_progress(0.65, "Mastering, EBU R128 loudness normalization and True Peak limiting")
     t0 = time.perf_counter()
-    mastered_mix, mastering_report = master_audio(
+    mastered_mix, mastering_report, total_linear_gain = master_audio(
         raw_mix,
         target_loudness_lufs=request.target_loudness,
         max_true_peak_dbtp=-1.0,
         sample_rate=request.sample_rate
     )
+    # Scale individual stems by total mastering gain to guarantee exact linear mix reconstruction on saved files
+    stems = {k: (v * total_linear_gain).astype(np.float32) for k, v in stems.items()}
     timings["mastering_time_ms"] = round((time.perf_counter() - t0) * 1000, 2)
     
     # 5. Sidechain Narration Ducking (if narration supplied)
@@ -116,7 +118,10 @@ async def execute_generation_pipeline(
         mastered_mix,
         target_duration=request.duration,
         sample_rate=request.sample_rate,
-        expected_channels=2
+        expected_channels=2,
+        tolerance_seconds=0.05,
+        target_loudness_lufs=request.target_loudness,
+        loudness_tolerance_lu=1.0
     )
     if val_result["warnings"]:
         warnings.extend(val_result["warnings"])
@@ -126,7 +131,7 @@ async def execute_generation_pipeline(
     # 7. Write Audio Artifacts
     update_progress(0.90, "Writing audio files (WAV, MP3) and stems")
     
-    # Stems
+    # Write mastered Stems (24-bit PCM)
     for stem_name, stem_audio in stems.items():
         sf.write(os.path.join(output_dir, f"stem_{stem_name}.wav"), stem_audio, request.sample_rate, subtype='PCM_24')
         
@@ -134,10 +139,20 @@ async def execute_generation_pipeline(
     mix_wav_path = os.path.join(output_dir, "mix.wav")
     sf.write(mix_wav_path, mastered_mix, request.sample_rate, subtype='PCM_24')
     
+    # Re-verify mathematical reconstruction from the saved disk files
+    read_mix, _ = sf.read(mix_wav_path)
+    read_stems = {k: sf.read(os.path.join(output_dir, f"stem_{k}.wav"))[0] for k in stems}
+    disk_recon = sum(read_stems[k] * DEFAULT_STEM_GAINS[k] for k in stems)
+    max_recon_error = float(np.max(np.abs(read_mix - disk_recon)))
+    
     # MP3 if requested
     if "mp3" in [f.lower() for f in request.output_formats]:
         mix_mp3_path = os.path.join(output_dir, "mix.mp3")
-        sf.write(mix_mp3_path, mastered_mix, request.sample_rate, format='MP3')
+        try:
+            sf.write(mix_mp3_path, mastered_mix, request.sample_rate, format='MP3')
+        except Exception as ex:
+            logger.warning(f"MP3 encoding failed: {ex}")
+            warnings.append(f"MP3 encoding skipped: {ex}")
         
     # Ducked mix if generated
     if ducked_mix is not None:

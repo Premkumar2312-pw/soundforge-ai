@@ -1,8 +1,8 @@
 {
   "manifest_version": "1.0.0",
   "job_id": "01_corporate_upbeat",
-  "created_at": "2026-10-15T12:02:54Z",
-  "completed_at": "2026-10-15T12:02:54.042355+00:00",
+  "created_at": "2026-10-15T12:59:07Z",
+  "completed_at": "2026-10-15T12:59:07.110658+00:00",
   "status": "completed",
   "request_parameters": {
     "prompt": "Upbeat modern corporate tech explainer music with inspiring synth melody",
@@ -72,7 +72,7 @@
   },
   "reconstruction_verification": {
     "formula": "Mix = Sum(Stem_i * Gain_i)",
-    "max_reconstruction_error": 0.0,
+    "max_reconstruction_error": 3.7550926212936986e-07,
     "perfect_reconstruction_verified": true
   },
   "audio_metrics": {
@@ -81,11 +81,11 @@
     "channel_layout": "Stereo",
     "bit_depth": "24-bit PCM",
     "actual_duration_seconds": 12.0,
-    "target_loudness_lufs": -14.0,
-    "measured_loudness_lufs": -14.11,
-    "true_peak_dbtp": -1.0,
+    "target_loudness_lufs": -16.0,
+    "measured_loudness_lufs": -16.0,
+    "true_peak_dbtp": -1.37,
     "max_true_peak_limit_dbtp": -1.0,
-    "mastering_gain_applied_db": -3.81
+    "mastering_gain_applied_db": -5.04
   },
   "ducking": {
     "ducking_applied": false,
@@ -106,15 +106,15 @@
     }
   },
   "timings_ms": {
-    "generation_time_ms": 954.06,
-    "mixing_time_ms": 38.2,
-    "mastering_time_ms": 155.21,
+    "generation_time_ms": 573.8,
+    "mixing_time_ms": 27.7,
+    "mastering_time_ms": 115.51,
     "ducking_time_ms": 0.0,
-    "total_pipeline_time_ms": 1461.25
+    "total_pipeline_time_ms": 1197.76
   },
   "cost_estimates": {
-    "compute_time_ms": 1461.25,
-    "estimated_cost_usd": 7.3e-05,
+    "compute_time_ms": 1197.76,
+    "estimated_cost_usd": 6e-05,
     "currency": "USD"
   },
   "artifacts": {

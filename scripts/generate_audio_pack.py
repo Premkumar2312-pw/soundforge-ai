@@ -22,7 +22,7 @@ DEMO_PACKS = [
             tempo=120.0,
             key="C_major",
             loopability=False,
-            target_loudness=-14.0,
+            target_loudness=-16.0,
             output_formats=["wav", "mp3"],
             seed=101
         )
@@ -35,7 +35,7 @@ DEMO_PACKS = [
             tempo=82.0,
             key="A_minor",
             loopability=True,
-            target_loudness=-14.0,
+            target_loudness=-16.0,
             output_formats=["wav", "mp3"],
             seed=202
         )
@@ -53,7 +53,7 @@ DEMO_PACKS = [
                 MusicalSection(name="climax_drop", duration=5.0)
             ],
             loopability=False,
-            target_loudness=-14.0,
+            target_loudness=-16.0,
             output_formats=["wav", "mp3"],
             seed=303
         )

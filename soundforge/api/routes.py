@@ -6,7 +6,7 @@ import os
 import uuid
 import time
 from typing import Optional
-from fastapi import APIRouter, Header, HTTPException, status, Response
+from fastapi import APIRouter, Header, HTTPException, status, Response, Request
 from fastapi.responses import FileResponse, HTMLResponse
 
 from soundforge.models import (
@@ -36,26 +36,31 @@ SERVER_START_TIME = time.time()
 async def create_music_job(
     request: MusicJobRequest,
     response: Response,
+    http_request: Request,
     idempotency_key: Optional[str] = Header(None, alias="Idempotency-Key")
 ):
+    corr_id = getattr(http_request.state, "correlation_id", str(uuid.uuid4()))
+
     # Idempotency check
     if idempotency_key:
         payload_hash = idempotency_manager.compute_payload_hash(request.model_dump())
         cached = idempotency_manager.get(idempotency_key)
         if cached:
             if cached.payload_hash == payload_hash:
-                logger.info(f"Idempotent request recognized for key {idempotency_key}")
+                logger.info(f"Idempotent request recognized for key {idempotency_key}", extra={"correlation_id": corr_id})
                 response.status_code = status.HTTP_202_ACCEPTED
-                return MusicJobResponse(**cached.response_payload)
+                cached_resp = cached.response_payload.copy()
+                cached_resp["correlation_id"] = corr_id
+                return MusicJobResponse(**cached_resp)
             else:
-                logger.warning(f"Idempotency conflict for key {idempotency_key}")
+                logger.warning(f"Idempotency conflict for key {idempotency_key}", extra={"correlation_id": corr_id})
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Idempotency key collision with differing request payload."
                 )
 
     job_id = str(uuid.uuid4())
-    job_state = job_manager.create_job(job_id, request)
+    job_state = job_manager.create_job(job_id, request, correlation_id=corr_id)
 
     # Launch background task
     import asyncio
@@ -70,7 +75,8 @@ async def create_music_job(
         "message": "Background music generation job accepted and enqueued.",
         "created_at": job_state.created_at,
         "estimated_duration_seconds": est_duration,
-        "idempotency_key": idempotency_key
+        "idempotency_key": idempotency_key,
+        "correlation_id": corr_id
     }
 
     if idempotency_key:
@@ -84,13 +90,15 @@ async def create_music_job(
     summary="Get music generation job status",
     description="Poll progress, execution status, manifest, and download URLs for a job."
 )
-async def get_job_status(job_id: str):
+async def get_job_status(job_id: str, http_request: Request):
     job = job_manager.get_job(job_id)
     if not job:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Job '{job_id}' not found."
         )
+
+    corr_id = job.correlation_id or getattr(http_request.state, "correlation_id", None)
 
     return JobStatusResponse(
         job_id=job.job_id,
@@ -102,7 +110,8 @@ async def get_job_status(job_id: str):
         completed_at=job.completed_at,
         error=job.error,
         artifacts=job.artifacts if job.status == JobStatus.COMPLETED else None,
-        manifest=job.manifest if job.status == JobStatus.COMPLETED else None
+        manifest=job.manifest if job.status == JobStatus.COMPLETED else None,
+        correlation_id=corr_id
     )
 
 @router.get(

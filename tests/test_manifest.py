@@ -13,8 +13,8 @@ def test_manifest_schema_completeness():
     ]
     stem_gains = {"drums": 0.85, "bass": 0.80, "chords": 0.70, "melody": 0.75}
     mastering_report = {
-        "target_loudness_lufs": -14.0,
-        "final_loudness_lufs": -14.02,
+        "target_loudness_lufs": -16.0,
+        "final_loudness_lufs": -16.02,
         "final_true_peak_dbtp": -1.05,
         "max_true_peak_limit_dbtp": -1.0,
         "gain_applied_db": 1.2

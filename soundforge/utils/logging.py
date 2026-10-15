@@ -18,6 +18,8 @@ class JSONFormatter(logging.Formatter):
         }
         if hasattr(record, "job_id"):
             log_obj["job_id"] = record.job_id
+        if hasattr(record, "correlation_id"):
+            log_obj["correlation_id"] = record.correlation_id
         if hasattr(record, "duration_ms"):
             log_obj["duration_ms"] = record.duration_ms
         if hasattr(record, "extra_data") and isinstance(record.extra_data, dict):
