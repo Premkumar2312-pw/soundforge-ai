@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Output audio and artifacts
+storage/
+output/
+test_output/
+*.wav
+*.mp3
+!tests/fixtures/*.wav
+!tests/fixtures/*.mp3
+
+# Logs
+*.log
+logs/
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test & coverage
+.pytest_cache/
+.coverage
+htmlcov/
