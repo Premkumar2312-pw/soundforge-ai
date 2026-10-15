@@ -8,7 +8,7 @@
     "measured_lufs": -14.08,
     "true_peak_dbtp": -1.0,
     "max_recon_error": 0.0,
-    "execution_time_s": 0.59,
+    "execution_time_s": 0.58,
     "status": "PASS"
   },
   {
@@ -20,7 +20,7 @@
     "measured_lufs": -14.02,
     "true_peak_dbtp": -1.0,
     "max_recon_error": 0.0,
-    "execution_time_s": 0.65,
+    "execution_time_s": 0.59,
     "status": "PASS"
   },
   {
@@ -44,7 +44,7 @@
     "measured_lufs": -16.0,
     "true_peak_dbtp": -1.05,
     "max_recon_error": 0.0,
-    "execution_time_s": 0.5,
+    "execution_time_s": 0.52,
     "status": "PASS"
   },
   {
@@ -56,7 +56,7 @@
     "measured_lufs": -14.09,
     "true_peak_dbtp": -1.0,
     "max_recon_error": 0.0,
-    "execution_time_s": 0.52,
+    "execution_time_s": 0.51,
     "status": "PASS"
   }
 ]
