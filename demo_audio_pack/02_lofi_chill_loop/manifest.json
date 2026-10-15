@@ -1,0 +1,130 @@
+{
+  "manifest_version": "1.0.0",
+  "job_id": "02_lofi_chill_loop",
+  "created_at": "2026-10-15T12:02:55Z",
+  "completed_at": "2026-10-15T12:02:55.628581+00:00",
+  "status": "completed",
+  "request_parameters": {
+    "prompt": "Chill lo-fi study beat with mellow electric piano and warm bassline",
+    "target_duration_seconds": 16.0,
+    "loopability": true,
+    "seed": 202,
+    "sample_rate": 48000,
+    "output_formats": [
+      "wav",
+      "mp3"
+    ]
+  },
+  "musical_settings": {
+    "genre": "lofi",
+    "tempo_bpm": 82.0,
+    "key": "A_minor",
+    "time_signature": "4/4",
+    "loopability": true,
+    "ending_type": "seamless_loop"
+  },
+  "sections": [
+    {
+      "name": "intro",
+      "duration_seconds": 3.2,
+      "start_seconds": 0.0,
+      "end_seconds": 3.2,
+      "start_bar": 0,
+      "end_bar": 1
+    },
+    {
+      "name": "verse",
+      "duration_seconds": 4.8,
+      "start_seconds": 3.2,
+      "end_seconds": 8.0,
+      "start_bar": 1,
+      "end_bar": 2
+    },
+    {
+      "name": "chorus",
+      "duration_seconds": 4.8,
+      "start_seconds": 8.0,
+      "end_seconds": 12.8,
+      "start_bar": 2,
+      "end_bar": 4
+    },
+    {
+      "name": "outro",
+      "duration_seconds": 3.2,
+      "start_seconds": 12.8,
+      "end_seconds": 16.0,
+      "start_bar": 4,
+      "end_bar": 5
+    }
+  ],
+  "beat_bar_timing": {
+    "bpm": 82.0,
+    "seconds_per_beat": 0.7317,
+    "seconds_per_bar": 2.9268,
+    "total_bars": 5,
+    "total_beats": 21
+  },
+  "stem_gains": {
+    "drums": 0.85,
+    "bass": 0.8,
+    "chords": 0.7,
+    "melody": 0.75
+  },
+  "reconstruction_verification": {
+    "formula": "Mix = Sum(Stem_i * Gain_i)",
+    "max_reconstruction_error": 0.0,
+    "perfect_reconstruction_verified": true
+  },
+  "audio_metrics": {
+    "sample_rate_hz": 48000,
+    "channels": 2,
+    "channel_layout": "Stereo",
+    "bit_depth": "24-bit PCM",
+    "actual_duration_seconds": 16.0,
+    "target_loudness_lufs": -14.0,
+    "measured_loudness_lufs": -14.15,
+    "true_peak_dbtp": -1.0,
+    "max_true_peak_limit_dbtp": -1.0,
+    "mastering_gain_applied_db": -3.4
+  },
+  "ducking": {
+    "ducking_applied": false,
+    "reason": "No narration audio provided"
+  },
+  "provenance": {
+    "provider": "SoundForge Procedural AI Engine",
+    "model_version": "1.0.0-procedural-dsp",
+    "seed": 202,
+    "commercial_cleared": true,
+    "licensing_terms": "100% procedurally synthesized without proprietary soundfonts, unlicensed samples, or non-commercial AI weights. Fully cleared for commercial use.",
+    "component_licenses": {
+      "soundforge_engine": "MIT",
+      "numpy": "BSD-3-Clause",
+      "scipy": "BSD-3-Clause",
+      "pyloudnorm": "MIT",
+      "soundfile_libsndfile": "LGPL-2.1 / BSD"
+    }
+  },
+  "timings_ms": {
+    "generation_time_ms": 1035.68,
+    "mixing_time_ms": 47.81,
+    "mastering_time_ms": 149.2,
+    "ducking_time_ms": 0.0,
+    "total_pipeline_time_ms": 1579.82
+  },
+  "cost_estimates": {
+    "compute_time_ms": 1579.82,
+    "estimated_cost_usd": 7.9e-05,
+    "currency": "USD"
+  },
+  "artifacts": {
+    "mix_wav": "mix.wav",
+    "stem_drums": "stem_drums.wav",
+    "stem_bass": "stem_bass.wav",
+    "stem_chords": "stem_chords.wav",
+    "stem_melody": "stem_melody.wav",
+    "manifest_json": "manifest.json",
+    "mix_mp3": "mix.mp3"
+  },
+  "warnings": []
+}
