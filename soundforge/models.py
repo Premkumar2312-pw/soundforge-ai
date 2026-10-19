@@ -90,6 +90,17 @@ class MusicJobRequest(BaseModel):
     target_loudness: Optional[float] = Field(-16.0, ge=-36.0, le=-6.0, description="Top-level fallback for target LUFS")
     output_formats: Optional[List[str]] = Field(default_factory=lambda: ["wav"], description="Top-level fallback for output formats")
     callback_url: Optional[str] = Field(None, description="Webhook URL notified upon job completion")
+    idempotency_key: Optional[str] = Field(None, description="Client-provided idempotency key")
+
+    @field_validator("narration_url")
+    def validate_narration_url(cls, v: Optional[str]) -> Optional[str]:
+        if v:
+            if "://" in v:
+                from soundforge.dsp.ducking import is_ssrf_safe_url
+                safe, reason = is_ssrf_safe_url(v)
+                if not safe:
+                    raise ValueError(f"narration_url validation failed: {reason}")
+        return v
 
     @model_validator(mode="before")
     @classmethod

@@ -40,20 +40,21 @@ async def create_music_job(
     idempotency_key: Optional[str] = Header(None, alias="Idempotency-Key")
 ):
     corr_id = getattr(http_request.state, "correlation_id", str(uuid.uuid4()))
+    active_idem_key = idempotency_key or request.idempotency_key
 
     # Idempotency check
-    if idempotency_key:
+    if active_idem_key:
         payload_hash = idempotency_manager.compute_payload_hash(request.model_dump())
-        cached = idempotency_manager.get(idempotency_key)
+        cached = idempotency_manager.get(active_idem_key)
         if cached:
             if cached.payload_hash == payload_hash:
-                logger.info(f"Idempotent request recognized for key {idempotency_key}", extra={"correlation_id": corr_id})
+                logger.info(f"Idempotent request recognized for key {active_idem_key}", extra={"correlation_id": corr_id})
                 response.status_code = status.HTTP_202_ACCEPTED
                 cached_resp = cached.response_payload.copy()
                 cached_resp["correlation_id"] = corr_id
                 return MusicJobResponse(**cached_resp)
             else:
-                logger.warning(f"Idempotency conflict for key {idempotency_key}", extra={"correlation_id": corr_id})
+                logger.warning(f"Idempotency conflict for key {active_idem_key}", extra={"correlation_id": corr_id})
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Idempotency key collision with differing request payload."
@@ -74,12 +75,12 @@ async def create_music_job(
         "message": "Background music generation job accepted and enqueued.",
         "created_at": job_state.created_at,
         "estimated_duration_seconds": est_duration,
-        "idempotency_key": idempotency_key,
+        "idempotency_key": active_idem_key,
         "correlation_id": corr_id
     }
 
-    if idempotency_key:
-        idempotency_manager.register(idempotency_key, payload_hash, resp_payload)
+    if active_idem_key:
+        idempotency_manager.register(active_idem_key, payload_hash, resp_payload)
 
     return MusicJobResponse(**resp_payload)
 

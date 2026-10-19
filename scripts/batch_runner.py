@@ -455,7 +455,7 @@ async def run_suite(client: httpx.AsyncClient, cases: List[Dict[str, Any]], suit
 async def main():
     parser = argparse.ArgumentParser(description="SoundForge AI Batch Runner")
     parser.add_argument("--url", type=str, default="", help="Optional base URL of running server")
-    parser.add_argument("--suite", type=str, default="all", choices=["all", "ten_prompts", "hard_cases"], help="Test suite to execute")
+    parser.add_argument("--suite", type=str, default="all", choices=["all", "ten_prompts", "diverse", "hard_cases"], help="Test suite to execute")
     parser.add_argument("--output-dir", type=str, default="test_output", help="Output directory for reports and artifacts")
     args = parser.parse_args()
 
@@ -463,7 +463,7 @@ async def main():
 
     cases_to_run = []
     suite_title = "Batch Matrix"
-    if args.suite == "ten_prompts":
+    if args.suite in ("ten_prompts", "diverse"):
         cases_to_run = TEN_PROMPTS_PACK
         suite_title = "10 Diverse Prompts Pack"
     elif args.suite == "hard_cases":
