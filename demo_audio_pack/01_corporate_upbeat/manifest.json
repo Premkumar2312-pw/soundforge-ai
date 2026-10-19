@@ -1,13 +1,14 @@
 {
   "manifest_version": "1.0.0",
   "job_id": "01_corporate_upbeat",
-  "created_at": "2026-10-15T12:59:07Z",
-  "completed_at": "2026-10-15T12:59:07.110658+00:00",
-  "status": "completed",
+  "created_at": "2026-10-19T12:48:57Z",
+  "completed_at": "2026-10-19T12:48:57.117503+00:00",
+  "status": "succeeded",
+  "ai_generated_label": "AI-Generated Background Music (Instrumental)",
   "request_parameters": {
     "prompt": "Upbeat modern corporate tech explainer music with inspiring synth melody",
     "target_duration_seconds": 12.0,
-    "loopability": false,
+    "loopable": false,
     "seed": 101,
     "sample_rate": 48000,
     "output_formats": [
@@ -26,6 +27,7 @@
   "sections": [
     {
       "name": "intro",
+      "mood": "intro",
       "duration_seconds": 2.4,
       "start_seconds": 0.0,
       "end_seconds": 2.4,
@@ -34,6 +36,7 @@
     },
     {
       "name": "verse",
+      "mood": "verse",
       "duration_seconds": 3.6,
       "start_seconds": 2.4,
       "end_seconds": 6.0,
@@ -42,6 +45,7 @@
     },
     {
       "name": "chorus",
+      "mood": "chorus",
       "duration_seconds": 3.6,
       "start_seconds": 6.0,
       "end_seconds": 9.6,
@@ -50,6 +54,7 @@
     },
     {
       "name": "outro",
+      "mood": "outro",
       "duration_seconds": 2.4,
       "start_seconds": 9.6,
       "end_seconds": 12.0,
@@ -72,8 +77,21 @@
   },
   "reconstruction_verification": {
     "formula": "Mix = Sum(Stem_i * Gain_i)",
-    "max_reconstruction_error": 3.7550926212936986e-07,
+    "max_reconstruction_error": 3.6954879767403526e-07,
+    "reconstruction_error_db": -128.65,
     "perfect_reconstruction_verified": true
+  },
+  "stem_bleed_analysis": {
+    "pairwise_correlations": {
+      "drums_vs_bass": 0.0135,
+      "drums_vs_chords": 0.0006,
+      "drums_vs_melody": 0.0002,
+      "bass_vs_chords": 0.0035,
+      "bass_vs_melody": 0.0081,
+      "chords_vs_melody": 0.0206
+    },
+    "max_cross_correlation": 0.0206,
+    "independent_stems_verified": true
   },
   "audio_metrics": {
     "sample_rate_hz": 48000,
@@ -83,9 +101,14 @@
     "actual_duration_seconds": 12.0,
     "target_loudness_lufs": -16.0,
     "measured_loudness_lufs": -16.0,
-    "true_peak_dbtp": -1.37,
+    "true_peak_dbtp": -1.36,
     "max_true_peak_limit_dbtp": -1.0,
-    "mastering_gain_applied_db": -5.04
+    "mastering_gain_applied_db": -2.3
+  },
+  "ending_and_loop_verification": {
+    "ending_type": "purposeful_cadence_fade",
+    "loop_boundary_discontinuity": 0.0,
+    "purposeful_cadence_verified": true
   },
   "ducking": {
     "ducking_applied": false,
@@ -106,24 +129,32 @@
     }
   },
   "timings_ms": {
-    "generation_time_ms": 573.8,
-    "mixing_time_ms": 27.7,
-    "mastering_time_ms": 115.51,
+    "generation_time_ms": 548.98,
+    "mixing_time_ms": 29.74,
+    "mastering_time_ms": 123.1,
     "ducking_time_ms": 0.0,
-    "total_pipeline_time_ms": 1197.76
+    "total_pipeline_time_ms": 1263.65
   },
   "cost_estimates": {
-    "compute_time_ms": 1197.76,
-    "estimated_cost_usd": 6e-05,
-    "currency": "USD"
+    "compute_time_ms": 1263.65,
+    "estimated_cost_usd": 6.3e-05,
+    "currency": "USD",
+    "estimation_method": "CPU execution time based on cloud compute pricing ($0.00005/s); zero external API fees"
   },
   "artifacts": {
     "mix_wav": "mix.wav",
+    "music_manifest_json": "music_manifest.json",
+    "manifest_json": "manifest.json",
     "stem_drums": "stem_drums.wav",
     "stem_bass": "stem_bass.wav",
     "stem_chords": "stem_chords.wav",
     "stem_melody": "stem_melody.wav",
-    "manifest_json": "manifest.json",
+    "stems": {
+      "drums": "stems/drums.wav",
+      "bass": "stems/bass.wav",
+      "chords": "stems/chords.wav",
+      "melody": "stems/melody.wav"
+    },
     "mix_mp3": "mix.mp3"
   },
   "warnings": []

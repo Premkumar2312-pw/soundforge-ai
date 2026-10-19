@@ -1,5 +1,5 @@
 """
-FastAPI Route Handlers for SoundForge AI (PS1 Specification)
+FastAPI Route Handlers for SoundForge AI (PS1 Specification & IncuBrix Integration Standard)
 """
 
 import os
@@ -66,12 +66,11 @@ async def create_music_job(
     import asyncio
     asyncio.create_task(job_manager.run_job(job_id))
 
-    # Estimated execution duration: roughly ~0.15s per second of requested audio on CPU
     est_duration = max(1.5, round(request.duration * 0.12, 1))
 
     resp_payload = {
         "job_id": job_id,
-        "status": JobStatus.PENDING,
+        "status": JobStatus.QUEUED,
         "message": "Background music generation job accepted and enqueued.",
         "created_at": job_state.created_at,
         "estimated_duration_seconds": est_duration,
@@ -85,9 +84,15 @@ async def create_music_job(
     return MusicJobResponse(**resp_payload)
 
 @router.get(
+    "/api/v1/jobs/{job_id}",
+    response_model=JobStatusResponse,
+    summary="Get job status (Assessment Contract)",
+    description="Poll progress, execution status, manifest, and download URLs for a job."
+)
+@router.get(
     "/api/v1/music/jobs/{job_id}",
     response_model=JobStatusResponse,
-    summary="Get music generation job status",
+    summary="Get music generation job status (Alias)",
     description="Poll progress, execution status, manifest, and download URLs for a job."
 )
 async def get_job_status(job_id: str, http_request: Request):
@@ -99,24 +104,31 @@ async def get_job_status(job_id: str, http_request: Request):
         )
 
     corr_id = job.correlation_id or getattr(http_request.state, "correlation_id", None)
+    is_done = job.status in (JobStatus.SUCCEEDED, JobStatus.COMPLETED)
 
     return JobStatusResponse(
         job_id=job.job_id,
         status=job.status,
         progress=round(job.progress, 2),
+        progress_percent=int(job.progress * 100),
         current_stage=job.current_stage,
         created_at=job.created_at,
         started_at=job.started_at,
         completed_at=job.completed_at,
         error=job.error,
-        artifacts=job.artifacts if job.status == JobStatus.COMPLETED else None,
-        manifest=job.manifest if job.status == JobStatus.COMPLETED else None,
+        artifacts=job.artifacts if is_done else None,
+        manifest=job.manifest if is_done else None,
         correlation_id=corr_id
     )
 
 @router.get(
-    "/api/v1/music/jobs/{job_id}/artifacts/{filename}",
-    summary="Download generation artifact",
+    "/api/v1/jobs/{job_id}/artifacts/{filename:path}",
+    summary="Download generation artifact (Assessment Contract)",
+    description="Download master mix, MP3, separate stems, or JSON manifest."
+)
+@router.get(
+    "/api/v1/music/jobs/{job_id}/artifacts/{filename:path}",
+    summary="Download generation artifact (Alias)",
     description="Download master mix, MP3, separate stems, or JSON manifest."
 )
 async def download_artifact(job_id: str, filename: str):
@@ -124,9 +136,9 @@ async def download_artifact(job_id: str, filename: str):
     if not job:
         # Check if files exist directly in storage
         if not storage.artifact_exists(job_id, filename):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job or artifact not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job or artifact '{filename}' not found.")
     else:
-        if job.status != JobStatus.COMPLETED:
+        if job.status not in (JobStatus.SUCCEEDED, JobStatus.COMPLETED):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Job is {job.status.value}")
 
     file_path = storage.get_artifact_path(job_id, filename)
@@ -144,7 +156,7 @@ async def download_artifact(job_id: str, filename: str):
     return FileResponse(
         path=file_path,
         media_type=media_type,
-        filename=filename
+        filename=os.path.basename(filename)
     )
 
 @router.get("/health", response_model=HealthResponse, summary="Liveness probe")
@@ -163,7 +175,6 @@ async def health_check():
 @router.get("/api/v1/ready", response_model=HealthResponse, summary="API v1 Readiness probe")
 async def readiness_check():
     uptime = time.time() - SERVER_START_TIME
-    # Check storage writability
     try:
         test_dir = storage.get_job_dir(".readiness-probe")
         is_ready = os.path.exists(test_dir)

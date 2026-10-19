@@ -1,0 +1,152 @@
+{
+  "manifest_version": "1.0.0",
+  "job_id": "03_cinematic_trailer",
+  "created_at": "2026-10-19T12:49:00Z",
+  "completed_at": "2026-10-19T12:49:00.204630+00:00",
+  "status": "succeeded",
+  "ai_generated_label": "AI-Generated Background Music (Instrumental)",
+  "request_parameters": {
+    "prompt": "Cinematic dramatic trailer intro with rising tension and pounding drums",
+    "target_duration_seconds": 14.0,
+    "loopable": false,
+    "seed": 303,
+    "sample_rate": 48000,
+    "output_formats": [
+      "wav",
+      "mp3"
+    ]
+  },
+  "musical_settings": {
+    "genre": "cinematic",
+    "tempo_bpm": 94.0,
+    "key": "D_minor",
+    "time_signature": "4/4",
+    "loopability": false,
+    "ending_type": "purposeful_cadence_fade"
+  },
+  "sections": [
+    {
+      "name": "intro_drone",
+      "mood": "intro_drone",
+      "duration_seconds": 3.0,
+      "start_seconds": 0.0,
+      "end_seconds": 3.0,
+      "start_bar": 0,
+      "end_bar": 1
+    },
+    {
+      "name": "tension_build",
+      "mood": "tension_build",
+      "duration_seconds": 6.0,
+      "start_seconds": 3.0,
+      "end_seconds": 9.0,
+      "start_bar": 1,
+      "end_bar": 3
+    },
+    {
+      "name": "climax_drop",
+      "mood": "climax_drop",
+      "duration_seconds": 5.0,
+      "start_seconds": 9.0,
+      "end_seconds": 14.0,
+      "start_bar": 3,
+      "end_bar": 5
+    }
+  ],
+  "beat_bar_timing": {
+    "bpm": 94.0,
+    "seconds_per_beat": 0.6383,
+    "seconds_per_bar": 2.5532,
+    "total_bars": 5,
+    "total_beats": 21
+  },
+  "stem_gains": {
+    "drums": 0.85,
+    "bass": 0.8,
+    "chords": 0.7,
+    "melody": 0.75
+  },
+  "reconstruction_verification": {
+    "formula": "Mix = Sum(Stem_i * Gain_i)",
+    "max_reconstruction_error": 3.6358833310767835e-07,
+    "reconstruction_error_db": -128.79,
+    "perfect_reconstruction_verified": true
+  },
+  "stem_bleed_analysis": {
+    "pairwise_correlations": {
+      "drums_vs_bass": 0.0012,
+      "drums_vs_chords": 0.0006,
+      "drums_vs_melody": 0.0003,
+      "bass_vs_chords": 0.0005,
+      "bass_vs_melody": 0.0162,
+      "chords_vs_melody": 0.0133
+    },
+    "max_cross_correlation": 0.0162,
+    "independent_stems_verified": true
+  },
+  "audio_metrics": {
+    "sample_rate_hz": 48000,
+    "channels": 2,
+    "channel_layout": "Stereo",
+    "bit_depth": "24-bit PCM",
+    "actual_duration_seconds": 14.0,
+    "target_loudness_lufs": -16.0,
+    "measured_loudness_lufs": -16.0,
+    "true_peak_dbtp": -1.58,
+    "max_true_peak_limit_dbtp": -1.0,
+    "mastering_gain_applied_db": -2.04
+  },
+  "ending_and_loop_verification": {
+    "ending_type": "purposeful_cadence_fade",
+    "loop_boundary_discontinuity": 0.0,
+    "purposeful_cadence_verified": true
+  },
+  "ducking": {
+    "ducking_applied": false,
+    "reason": "No narration audio provided"
+  },
+  "provenance": {
+    "provider": "SoundForge Procedural AI Engine",
+    "model_version": "1.0.0-procedural-dsp",
+    "seed": 303,
+    "commercial_cleared": true,
+    "licensing_terms": "100% procedurally synthesized without proprietary soundfonts, unlicensed samples, or non-commercial AI weights. Fully cleared for commercial use.",
+    "component_licenses": {
+      "soundforge_engine": "MIT",
+      "numpy": "BSD-3-Clause",
+      "scipy": "BSD-3-Clause",
+      "pyloudnorm": "MIT",
+      "soundfile_libsndfile": "LGPL-2.1 / BSD"
+    }
+  },
+  "timings_ms": {
+    "generation_time_ms": 594.68,
+    "mixing_time_ms": 27.79,
+    "mastering_time_ms": 118.73,
+    "ducking_time_ms": 0.0,
+    "total_pipeline_time_ms": 1405.18
+  },
+  "cost_estimates": {
+    "compute_time_ms": 1405.18,
+    "estimated_cost_usd": 7e-05,
+    "currency": "USD",
+    "estimation_method": "CPU execution time based on cloud compute pricing ($0.00005/s); zero external API fees"
+  },
+  "artifacts": {
+    "mix_wav": "mix.wav",
+    "music_manifest_json": "music_manifest.json",
+    "manifest_json": "manifest.json",
+    "stem_drums": "stem_drums.wav",
+    "stem_bass": "stem_bass.wav",
+    "stem_chords": "stem_chords.wav",
+    "stem_melody": "stem_melody.wav",
+    "stems": {
+      "drums": "stems/drums.wav",
+      "bass": "stems/bass.wav",
+      "chords": "stems/chords.wav",
+      "melody": "stems/melody.wav"
+    },
+    "mix_mp3": "mix.mp3"
+  },
+  "warnings": []
+}

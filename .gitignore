@@ -28,6 +28,8 @@ temp_test/
 *.mp3
 !tests/fixtures/*.wav
 !tests/fixtures/*.mp3
+!demo_audio_pack/**
+demo_audio_pack/*/stems/
 
 # Logs
 *.log

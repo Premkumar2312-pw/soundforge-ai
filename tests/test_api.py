@@ -82,7 +82,7 @@ async def test_job_lifecycle_idempotency_and_reconstruction():
         assert resp.status_code == 202
         data = resp.json()
         assert "job_id" in data
-        assert data["status"] == "pending"
+        assert data["status"] in ("pending", "queued")
         job_id = data["job_id"]
 
         # 2. Idempotent re-submission -> same job_id returned
@@ -107,7 +107,7 @@ async def test_job_lifecycle_idempotency_and_reconstruction():
             s_resp = await client.get(f"/api/v1/music/jobs/{job_id}")
             assert s_resp.status_code == 200
             status_data = s_resp.json()
-            if status_data["status"] == "completed":
+            if status_data["status"] in ("completed", "succeeded"):
                 completed = True
                 break
 

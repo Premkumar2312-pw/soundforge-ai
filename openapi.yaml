@@ -1,0 +1,574 @@
+openapi: 3.1.0
+info:
+  title: SoundForge AI - Background Music Engine for Video
+  description: "\n# SoundForge AI REST API (IncuBrix PS1 Specification)\n\nProfessional\
+    \ AI Background Music Engine for Video, conforming to IncuBrix Problem Statement\
+    \ PS1 specifications.\n\n### Key Capabilities:\n- **Asynchronous Background Processing**:\
+    \ HTTP 202 Accepted, job IDs, real-time progress polling.\n- **Genuine Multi-Track\
+    \ Instrument Stems**: Zero frequency-splitting policy; procedural independent\
+    \ synthesis of Drums, Bass, Chords, and Melody.\n- **Mathematical Reconstruction\
+    \ Guarantee**: Master mix mathematically reconstructs from stems using documented\
+    \ linear weights ($Mix = \\sum g_i \\cdot Stem_i$).\n- **Loudness & Peak Mastering**:\
+    \ ITU-R BS.1770-4 / EBU R128 loudness normalization and True Peak brickwall limiting\
+    \ ($\\le -1.0$ dBTP).\n- **Sidechain Narration Ducking**: Automatic voice envelope\
+    \ detection and smooth ducking attenuation.\n- **PS1 Manifest**: Full provenance,\
+    \ beat/bar grid, section timings, licensing, and audio metrics.\n- **Idempotency**:\
+    \ Transparent deduplication via `Idempotency-Key` headers.\n- **100% Cleared Commercial\
+    \ Licensing**: Zero proprietary soundfonts, samples, or restrictive weights.\n\
+    \    "
+  version: 1.0.0
+paths:
+  /api/v1/music/jobs:
+    post:
+      summary: Create background music generation job
+      description: Submits an asynchronous music generation job according to Problem
+        Statement PS1 specification.
+      operationId: create_music_job_api_v1_music_jobs_post
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency-Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MusicJobRequest'
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MusicJobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/music/jobs/{job_id}:
+    get:
+      summary: Get music generation job status (Alias)
+      description: Poll progress, execution status, manifest, and download URLs for
+        a job.
+      operationId: get_job_status_api_v1_music_jobs__job_id__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatusResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}:
+    get:
+      summary: Get job status (Assessment Contract)
+      description: Poll progress, execution status, manifest, and download URLs for
+        a job.
+      operationId: get_job_status_api_v1_jobs__job_id__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobStatusResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/music/jobs/{job_id}/artifacts/{filename}:
+    get:
+      summary: Download generation artifact (Alias)
+      description: Download master mix, MP3, separate stems, or JSON manifest.
+      operationId: download_artifact_api_v1_music_jobs__job_id__artifacts__filename__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Filename
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}/artifacts/{filename}:
+    get:
+      summary: Download generation artifact (Assessment Contract)
+      description: Download master mix, MP3, separate stems, or JSON manifest.
+      operationId: download_artifact_api_v1_jobs__job_id__artifacts__filename__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Job Id
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Filename
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/health:
+    get:
+      summary: API v1 Liveness probe
+      operationId: health_check_api_v1_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /health:
+    get:
+      summary: Liveness probe
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /api/v1/ready:
+    get:
+      summary: API v1 Readiness probe
+      operationId: readiness_check_api_v1_ready_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /ready:
+    get:
+      summary: Readiness probe
+      operationId: readiness_check_ready_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+        version:
+          type: string
+          title: Version
+        uptime_seconds:
+          type: number
+          title: Uptime Seconds
+        storage:
+          type: string
+          title: Storage
+        ready:
+          type: boolean
+          title: Ready
+      type: object
+      required:
+      - status
+      - version
+      - uptime_seconds
+      - storage
+      - ready
+      title: HealthResponse
+    JobStatus:
+      type: string
+      enum:
+      - queued
+      - running
+      - succeeded
+      - failed
+      - pending
+      - processing
+      - completed
+      title: JobStatus
+    JobStatusResponse:
+      properties:
+        job_id:
+          type: string
+          title: Job Id
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        progress:
+          type: number
+          maximum: 1.0
+          minimum: 0.0
+          title: Progress
+          description: Job progress from 0.0 to 1.0
+          default: 0.0
+        progress_percent:
+          anyOf:
+          - type: integer
+            maximum: 100.0
+            minimum: 0.0
+          - type: 'null'
+          title: Progress Percent
+          description: Job progress from 0 to 100
+          default: 0
+        current_stage:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Current Stage
+        created_at:
+          type: string
+          title: Created At
+        started_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Started At
+        completed_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Completed At
+        error:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Error
+        artifacts:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Artifacts
+        manifest:
+          anyOf:
+          - type: object
+          - type: 'null'
+          title: Manifest
+        correlation_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Correlation Id
+      type: object
+      required:
+      - job_id
+      - status
+      - created_at
+      title: JobStatusResponse
+    MusicJobRequest:
+      properties:
+        prompt:
+          type: string
+          maxLength: 1000
+          minLength: 1
+          title: Prompt
+          description: Natural language description of desired music
+        duration_s:
+          anyOf:
+          - type: number
+            maximum: 300.0
+            minimum: 5.0
+          - type: 'null'
+          title: Duration S
+          description: Exact duration in seconds (5.0 to 300.0s)
+        duration:
+          anyOf:
+          - type: number
+            maximum: 300.0
+            minimum: 5.0
+          - type: 'null'
+          title: Duration
+          description: Alias for duration_s
+        sections:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/MusicalSection'
+            type: array
+          - type: 'null'
+          title: Sections
+          description: Optional custom musical sections
+        tempo_bpm:
+          anyOf:
+          - type: number
+            maximum: 240.0
+            minimum: 40.0
+          - type: 'null'
+          title: Tempo Bpm
+          description: Tempo in beats per minute
+        tempo:
+          anyOf:
+          - type: number
+            maximum: 240.0
+            minimum: 40.0
+          - type: 'null'
+          title: Tempo
+          description: Alias for tempo_bpm
+        key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Key
+          description: Musical key/tonality, e.g. 'C_major', 'A_minor'
+        loopable:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Loopable
+          description: Whether track is engineered for seamless looping
+        loopability:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Loopability
+          description: Alias for loopable
+        narration_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Narration Url
+          description: URL or filepath to narration audio for sidechain ducking
+        seed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Seed
+          description: Random seed for reproducible generation
+        output:
+          anyOf:
+          - $ref: '#/components/schemas/OutputSettings'
+          - type: 'null'
+          description: Output settings (sample rate, target LUFS, formats)
+        sample_rate:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Sample Rate
+          description: Top-level fallback for sample rate
+          default: 48000
+        target_loudness:
+          anyOf:
+          - type: number
+            maximum: -6.0
+            minimum: -36.0
+          - type: 'null'
+          title: Target Loudness
+          description: Top-level fallback for target LUFS
+          default: -16.0
+        output_formats:
+          anyOf:
+          - items:
+              type: string
+            type: array
+          - type: 'null'
+          title: Output Formats
+          description: Top-level fallback for output formats
+        callback_url:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Callback Url
+          description: Webhook URL notified upon job completion
+      type: object
+      required:
+      - prompt
+      title: MusicJobRequest
+    MusicJobResponse:
+      properties:
+        job_id:
+          type: string
+          title: Job Id
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        message:
+          type: string
+          title: Message
+        created_at:
+          type: string
+          title: Created At
+        estimated_duration_seconds:
+          type: number
+          title: Estimated Duration Seconds
+        idempotency_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency Key
+        correlation_id:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Correlation Id
+      type: object
+      required:
+      - job_id
+      - status
+      - message
+      - created_at
+      - estimated_duration_seconds
+      title: MusicJobResponse
+    MusicalSection:
+      properties:
+        mood:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Mood
+          description: Mood or section type, e.g. 'intro', 'verse', 'chorus', 'outro'
+        start_s:
+          anyOf:
+          - type: number
+            minimum: 0.0
+          - type: 'null'
+          title: Start S
+          description: Start offset in seconds
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+          description: Section name
+        duration:
+          anyOf:
+          - type: number
+            exclusiveMinimum: 0.0
+          - type: 'null'
+          title: Duration
+          description: Duration in seconds
+        start_time:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Start Time
+          description: Start time in seconds
+        end_time:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: End Time
+          description: End time in seconds
+        start_bar:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Start Bar
+          description: Start bar index (0-indexed)
+        end_bar:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: End Bar
+          description: End bar index (0-indexed)
+      type: object
+      title: MusicalSection
+    OutputSettings:
+      properties:
+        sample_rate:
+          type: integer
+          title: Sample Rate
+          description: Audio sample rate in Hz (44100, 48000, 96000)
+          default: 48000
+        target_lufs:
+          type: number
+          maximum: -6.0
+          minimum: -36.0
+          title: Target Lufs
+          description: Target integrated loudness in LUFS
+          default: -16.0
+        formats:
+          items:
+            type: string
+          type: array
+          title: Formats
+          description: 'Output formats: [''wav'', ''mp3'']'
+      type: object
+      title: OutputSettings
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

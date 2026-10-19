@@ -26,15 +26,15 @@ def generate_adsr(
     a_samples = int(attack_s * sr)
     d_samples = int(decay_s * sr)
     r_samples = int(release_s * sr)
-    
+
     if a_samples + d_samples + r_samples >= total_samples:
         scale = total_samples / max(1, (a_samples + d_samples + r_samples))
         a_samples = int(a_samples * scale)
         d_samples = int(d_samples * scale)
         r_samples = int(r_samples * scale)
-    
+
     s_samples = max(0, total_samples - (a_samples + d_samples + r_samples))
-    
+
     env = []
     if a_samples > 0:
         env.append(np.linspace(0.0, 1.0, a_samples, endpoint=False))
@@ -44,7 +44,7 @@ def generate_adsr(
         env.append(np.full(s_samples, sustain_level))
     if r_samples > 0:
         env.append(np.linspace(sustain_level, 0.0, r_samples))
-        
+
     full_env = np.concatenate(env) if env else np.zeros(total_samples)
     if len(full_env) < total_samples:
         full_env = np.pad(full_env, (0, total_samples - len(full_env)))
@@ -54,7 +54,7 @@ def generate_adsr(
 
 class ProceduralSynthesizer:
     """Multi-stem synthesizer generating Drums, Bass, Chords, and Melody."""
-    
+
     def __init__(self, sample_rate: int = 48000, seed: int = 42):
         self.sample_rate = sample_rate
         self.seed = seed
@@ -123,9 +123,9 @@ class ProceduralSynthesizer:
         if n <= 0:
             return np.zeros((0, 2), dtype=np.float32)
         t = np.linspace(0, duration_s, n, endpoint=False)
-        
+
         freq = midi_to_hz(midi_note) * (2.0 ** (detune_cents / 1200.0))
-        
+
         if waveform == 'saw':
             wave = signal.sawtooth(2.0 * np.pi * freq * t)
         elif waveform == 'square':
@@ -134,20 +134,20 @@ class ProceduralSynthesizer:
             wave = signal.sawtooth(2.0 * np.pi * freq * t, width=0.5)
         else:
             wave = np.sin(2.0 * np.pi * freq * t)
-            
+
         # Resonant filter
         nyquist = sr / 2.0
         safe_cutoff = min(max(50.0, cutoff_hz), nyquist * 0.9)
         sos = signal.butter(2, safe_cutoff, btype='lowpass', fs=sr, output='sos')
         filtered = signal.sosfilt(sos, wave)
-        
+
         # Soft saturation
         filtered = np.tanh(filtered * 1.2)
-        
+
         # Envelope
         env = generate_adsr(n, attack_s, decay_s, sustain_level, release_s, sr)
         audio = filtered * env
-        
+
         # Stereo panning
         left_gain = math.cos((pan + 1.0) * math.pi / 4.0)
         right_gain = math.sin((pan + 1.0) * math.pi / 4.0)
@@ -170,67 +170,67 @@ class ProceduralSynthesizer:
         total_samples = int(duration * sr)
         spb = 60.0 / bpm
         seconds_per_bar = spb * 4.0
-        
+
         stem_drums = np.zeros((total_samples, 2), dtype=np.float32)
         stem_bass = np.zeros((total_samples, 2), dtype=np.float32)
         stem_chords = np.zeros((total_samples, 2), dtype=np.float32)
         stem_melody = np.zeros((total_samples, 2), dtype=np.float32)
-        
+
         kick_sample = self.synthesize_kick()
         snare_sample = self.synthesize_snare()
         hihat_closed = self.synthesize_hihat(open_hat=False)
         hihat_open = self.synthesize_hihat(open_hat=True)
         crash_sample = self.synthesize_crash()
-        
+
         num_bars = int(math.ceil(duration / seconds_per_bar))
-        
+
         # Render section by section
         for sec in sections:
             sec_start = sec.start_time
             sec_end = min(sec.end_time, duration)
             sec_dur = sec_end - sec_start
             sec_name = sec.name.lower()
-            
+
             # Crash cymbal on new major sections (intro, chorus)
             if ("chorus" in sec_name or "drop" in sec_name or sec_start == 0.0) and not loopability:
                 idx = int(sec_start * sr)
                 end_idx = min(idx + len(crash_sample), total_samples)
                 stem_drums[idx:end_idx] += crash_sample[:end_idx - idx] * 0.45
-            
+
             # Determine section intensity
             is_intro = "intro" in sec_name
             is_outro = "outro" in sec_name
             is_chorus = "chorus" in sec_name or "drop" in sec_name or "main" in sec_name
-            
+
             bar_start_idx = int(sec_start / seconds_per_bar)
             bar_end_idx = int(math.ceil(sec_end / seconds_per_bar))
-            
+
             for bar_i in range(bar_start_idx, bar_end_idx):
                 bar_t = bar_i * seconds_per_bar
                 if bar_t >= sec_end - 0.05:
                     break
-                    
+
                 chord_info = chord_progression[bar_i % len(chord_progression)]
-                
+
                 # --- 1. DRUMS RENDERING ---
                 for beat in range(4):
                     beat_t = bar_t + beat * spb
                     if beat_t >= sec_end or beat_t >= duration - 0.05:
                         break
-                    
+
                     # Kick: in verse/chorus on beats 0 & 2; four-on-floor in dance
                     kick_hits = [0, 1, 2, 3] if (genre == "dance" and is_chorus) else [0, 2]
                     if beat in kick_hits and (not is_intro or beat == 0):
                         idx = int(beat_t * sr)
                         end_idx = min(idx + len(kick_sample), total_samples)
                         stem_drums[idx:end_idx] += kick_sample[:end_idx - idx] * 0.90
-                    
+
                     # Snare: on beats 1 & 3
                     if beat in [1, 3] and not is_intro:
                         idx = int(beat_t * sr)
                         end_idx = min(idx + len(snare_sample), total_samples)
                         stem_drums[idx:end_idx] += snare_sample[:end_idx - idx] * 0.85
-                        
+
                     # Hi-hats: 8th notes
                     for sub in [0.0, 0.5]:
                         sub_t = beat_t + sub * spb
@@ -335,10 +335,11 @@ class ProceduralSynthesizer:
                 for stem in [stem_drums, stem_bass, stem_chords, stem_melody]:
                     stem[-fade_len:, 0] *= fade_curve
                     stem[-fade_len:, 1] *= fade_curve
-                    
+
         # Controlled stem saturation for dynamic range & headroom consistency
-        for s_arr in [stem_drums, stem_bass, stem_chords, stem_melody]:
-            s_arr[:] = np.tanh(s_arr * 1.5) * 0.72
+        for s_arr in [stem_bass, stem_chords, stem_melody]:
+            s_arr[:] = np.tanh(s_arr * 1.5) * 0.58
+        stem_drums[:] = np.tanh(stem_drums * 1.4) * 0.44
 
         return {
             "drums": stem_drums,
@@ -346,3 +347,65 @@ class ProceduralSynthesizer:
             "chords": stem_chords,
             "melody": stem_melody
         }
+
+    def render_single_stem(
+        self,
+        stem_name: str,
+        duration: float,
+        bpm: float,
+        sections: List[MusicalSection],
+        chord_progression: list,
+        genre: str = "electronic",
+        loopability: bool = False
+    ) -> np.ndarray:
+        """
+        Regenerate a single instrument stem without altering the others.
+        Guarantees byte-for-byte reproducibility of unmodified stems.
+        """
+        all_stems = self.render_all_stems(
+            duration=duration,
+            bpm=bpm,
+            sections=sections,
+            chord_progression=chord_progression,
+            genre=genre,
+            loopability=loopability
+        )
+        if stem_name not in all_stems:
+            raise ValueError(f"Unknown stem '{stem_name}'. Available: {list(all_stems.keys())}")
+        return all_stems[stem_name]
+
+def compute_stem_bleed_matrix(stems: Dict[str, np.ndarray]) -> Dict[str, Any]:
+    """
+    Compute pairwise normalized cross-correlation between stems to measure stem independence / bleed.
+    In genuine procedural multi-track synthesis, stem bleed is near zero (< 0.15),
+    unlike frequency-split or phase-cancelled stems which exhibit high correlation.
+    """
+    keys = list(stems.keys())
+    matrix = {}
+    max_cross_corr = 0.0
+    for i in range(len(keys)):
+        for j in range(i + 1, len(keys)):
+            k1, k2 = keys[i], keys[j]
+            s1 = np.mean(stems[k1], axis=1) if stems[k1].ndim > 1 else stems[k1]
+            s2 = np.mean(stems[k2], axis=1) if stems[k2].ndim > 1 else stems[k2]
+            norm1 = float(np.linalg.norm(s1))
+            norm2 = float(np.linalg.norm(s2))
+            if norm1 > 1e-6 and norm2 > 1e-6:
+                corr = float(np.abs(np.dot(s1, s2) / (norm1 * norm2)))
+            else:
+                corr = 0.0
+            matrix[f"{k1}_vs_{k2}"] = round(corr, 4)
+            if corr > max_cross_corr:
+                max_cross_corr = corr
+    return {
+        "pairwise_correlations": matrix,
+        "max_cross_correlation": round(max_cross_corr, 4),
+        "independent_stems_verified": bool(max_cross_corr < 0.25)
+    }
+
+def measure_loop_discontinuity(audio: np.ndarray) -> float:
+    """Measure loop boundary discontinuity between first and last sample frames."""
+    if len(audio) < 2:
+        return 0.0
+    diff = np.abs(audio[0] - audio[-1])
+    return float(np.max(diff))
