@@ -139,3 +139,40 @@ async def test_job_lifecycle_idempotency_and_reconstruction():
         man_resp = await client.get(f"/api/v1/music/jobs/{job_id}/artifacts/manifest.json")
         assert man_resp.status_code == 200
         assert man_resp.headers["content-type"] == "application/json"
+
+@pytest.mark.asyncio
+async def test_demo_ui_page_and_contract():
+    """Verify Demo UI loads, exposes necessary interactive controls, and has correct API polling logic."""
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        # Check both /demo and / routes
+        resp_demo = await client.get("/demo")
+        assert resp_demo.status_code == 200
+        assert "text/html" in resp_demo.headers["content-type"]
+        html = resp_demo.text
+
+        resp_root = await client.get("/")
+        assert resp_root.status_code == 200
+        assert resp_root.text == html
+
+        # Verify key UI inputs
+        for input_id in [
+            'id="promptInput"', 'id="durationSlider"', 'id="tempoSlider"',
+            'id="lufsSlider"', 'id="keySelect"', 'id="loopCheck"',
+            'id="mp3Check"', 'id="generateBtn"'
+        ]:
+            assert input_id in html, f"Missing input element: {input_id}"
+
+        # Verify key display and player containers
+        for container_id in [
+            'id="emptyState"', 'id="resultsPanel"', 'id="alertBox"',
+            'id="audioMix"', 'id="audioDrums"', 'id="audioBass"',
+            'id="audioChords"', 'id="audioMelody"', 'id="downloadLinks"',
+            'id="manifestViewer"', 'id="dlManifestLink"'
+        ]:
+            assert container_id in html, f"Missing container/player: {container_id}"
+
+        # Verify JavaScript polling handles both 'succeeded' and 'completed'
+        assert "data.status === 'succeeded'" in html or "data.status === 'completed'" in html
+        assert "resolveArtifactUrl" in html
+        assert "renderCompletedJob" in html
