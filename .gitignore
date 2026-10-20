@@ -19,7 +19,7 @@ ENV/
 credentials.json
 
 # Output audio and artifacts
-storage/
+/storage/
 output/
 test_output/
 poc_output/
