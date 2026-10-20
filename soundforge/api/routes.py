@@ -6,7 +6,8 @@ import os
 import uuid
 import time
 from typing import Optional
-from fastapi import APIRouter, Header, HTTPException, status, Response, Request
+from fastapi import APIRouter, Header, HTTPException, status, Response, Request, UploadFile, File
+import soundfile as sf
 from fastapi.responses import FileResponse, HTMLResponse
 
 from soundforge.models import (
@@ -159,6 +160,81 @@ async def download_artifact(job_id: str, filename: str):
         media_type=media_type,
         filename=os.path.basename(filename)
     )
+
+@router.post(
+    "/api/v1/narration/upload",
+    summary="Upload narration audio for sidechain ducking",
+    description="Accepts WAV or MP3 audio up to 50 MB and returns a local narration URL for use in generation requests."
+)
+@router.post(
+    "/api/v1/audio/upload",
+    summary="Upload audio file (Alias)",
+    description="Upload audio file for processing or narration."
+)
+async def upload_narration_audio(file: UploadFile = File(...)):
+    filename = file.filename or "narration.wav"
+    ext = os.path.splitext(filename)[1].lower()
+    if ext not in [".wav", ".mp3"]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Only .wav and .mp3 narration files are supported."
+        )
+
+    contents = await file.read()
+    if len(contents) > 50 * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Audio file exceeds 50 MB limit."
+        )
+    if len(contents) < 100:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Audio file is empty or corrupted."
+        )
+
+    upload_id = str(uuid.uuid4())
+    upload_dir = os.path.join(settings.STORAGE_DIR, "_uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+    safe_name = f"{upload_id}_{os.path.basename(filename)}"
+    file_path = os.path.join(upload_dir, safe_name)
+    with open(file_path, "wb") as f:
+        f.write(contents)
+
+    try:
+        data, sr = sf.read(file_path)
+        dur = round(len(data) / sr, 2)
+    except Exception as ex:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid or corrupted audio file: {ex}"
+        )
+
+    narration_url = f"/api/v1/narration/files/{safe_name}"
+    return {
+        "status": "uploaded",
+        "narration_url": narration_url,
+        "filename": filename,
+        "duration_s": dur,
+        "sample_rate": sr,
+        "file_size_bytes": len(contents)
+    }
+
+@router.get(
+    "/api/v1/narration/files/{filename}",
+    summary="Download or stream uploaded narration audio",
+    description="Retrieves previously uploaded narration audio."
+)
+async def get_uploaded_narration(filename: str):
+    safe_basename = os.path.basename(filename)
+    upload_dir = os.path.join(settings.STORAGE_DIR, "_uploads")
+    file_path = os.path.join(upload_dir, safe_basename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Narration file not found.")
+    ext = os.path.splitext(safe_basename)[1].lower()
+    media_type = "audio/wav" if ext == ".wav" else "audio/mpeg"
+    return FileResponse(file_path, media_type=media_type, filename=safe_basename)
 
 @router.get("/health", response_model=HealthResponse, summary="Liveness probe")
 @router.get("/api/v1/health", response_model=HealthResponse, summary="API v1 Liveness probe")

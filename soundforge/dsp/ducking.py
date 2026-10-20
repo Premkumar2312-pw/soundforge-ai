@@ -50,8 +50,23 @@ def is_ssrf_safe_url(url: str) -> Tuple[bool, str]:
                     return True, ""
                 return False, f"Access to private network address {ip} is blocked for security."
     except ValueError:
-        # Not a raw IP literal; hostname resolution
-        pass
+        # Resolve hostname via DNS to prevent DNS rebinding or domains pointing to private IPs
+        import socket
+        try:
+            addr_info = socket.getaddrinfo(hostname, None)
+            for item in addr_info:
+                resolved_ip_str = item[4][0]
+                try:
+                    resolved_ip = ipaddress.ip_address(resolved_ip_str)
+                    for net in BLOCKED_IP_NETWORKS:
+                        if resolved_ip in net:
+                            if os.environ.get("ALLOW_LOCAL_SSRF_TESTING") == "1":
+                                return True, ""
+                            return False, f"Hostname '{hostname}' resolves to blocked private address {resolved_ip}."
+                except ValueError:
+                    pass
+        except socket.gaierror:
+            return False, f"Unable to resolve hostname '{hostname}'."
 
     return True, ""
 
@@ -76,9 +91,14 @@ async def load_narration_audio(narration_source: str, target_sr: int = 48000) ->
             audio_bytes = io.BytesIO(resp.content)
             data, sr = sf.read(audio_bytes, dtype='float32')
     else:
-        if not os.path.exists(narration_source):
+        # Check if relative route to uploaded narration file
+        actual_path = narration_source
+        if narration_source.startswith("/api/v1/narration/files/"):
+            from soundforge.config import settings
+            actual_path = os.path.join(settings.STORAGE_DIR, "_uploads", os.path.basename(narration_source))
+        if not os.path.exists(actual_path):
             raise FileNotFoundError(f"Narration file not found: {narration_source}")
-        data, sr = sf.read(narration_source, dtype='float32')
+        data, sr = sf.read(actual_path, dtype='float32')
 
     # Convert mono to stereo if needed
     if data.ndim == 1:

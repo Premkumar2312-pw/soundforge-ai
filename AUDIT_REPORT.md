@@ -46,7 +46,7 @@ SoundForge AI was audited end-to-end against the authoritative IncuBrix PS1 spec
 
 | Item # | Integration Standard | Status | Evidence & Verification Procedure |
 | :---: | :--- | :---: | :--- |
-| **1** | **One-command Startup & Test** | **PASS** | `docker compose up --build -d` builds and launches container. `python -m pytest tests/ -v` runs all 19 tests offline without API keys. `.env.example` documents all supported variables. |
+| **1** | **One-command Startup & Test** | **PASS** | `docker compose up --build -d` builds and launches container. `python -m pytest tests/ -v` runs all 28 tests offline without API keys. `.env.example` documents all supported variables. |
 | **2** | **Accurate OpenAPI 3.1** | **PASS** | Root-level `openapi.yaml` exported directly from FastAPI application schema (OpenAPI 3.1.0). Endpoints, schemas, headers, and responses match runtime behavior. |
 | **3** | **Background Jobs** | **PASS** | POST `/api/v1/music/jobs` returns HTTP 202 and `job_id`. Polling endpoint `GET /api/v1/jobs/{job_id}` exposes `queued`, `running`, `succeeded`, `failed` states, progress from 0 to 100%, and artifact links. Webhook callbacks signed with HMAC-SHA256 (`X-IncuBrix-Signature`). |
 | **4** | **Idempotency** | **PASS** | `Idempotency-Key` header with SHA-256 payload caching. Duplicate requests return existing job; duplicate key with conflicting payload returns HTTP 409 Conflict. |

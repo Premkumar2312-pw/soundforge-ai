@@ -5,7 +5,7 @@
 [![OpenAPI 3.1](https://img.shields.io/badge/OpenAPI-3.1.0-6BA539.svg)](file:///openapi.yaml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Commercial Clearance](https://img.shields.io/badge/Commercial_Clearance-100%25_Verified-brightgreen.svg)](SOURCES.md)
-[![Tests](https://img.shields.io/badge/Tests-19%2F19_Passing-brightgreen.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-28%2F28_Passing-brightgreen.svg)]()
 
 **SoundForge AI** is an enterprise-grade AI Background Music Engine built for the **IncuBrix Software Engineer Assessment (Problem Statement PS1)**. It provides automated, high-fidelity background music generation tailored for video creators, editors, podcasts, and automated media pipelines.
 
@@ -98,7 +98,7 @@ pip install -r requirements.txt
 # 4. Copy configuration template
 Copy-Item .env.example .env
 
-# 5. Run full automated test suite (19 passing tests)
+# 5. Run full automated test suite (28 passing tests)
 python -m pytest tests/ -v
 
 # 6. Run the 10 diverse musical styles batch runner

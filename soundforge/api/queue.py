@@ -7,6 +7,7 @@ import asyncio
 import hmac
 import hashlib
 import json
+import os
 import time
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
@@ -86,7 +87,8 @@ class JobManager:
                 "manifest_json": f"{base_art}/manifest.json"
             }
             if "mp3" in [fmt.lower() for fmt in job.request.output_formats]:
-                artifacts["mix_mp3"] = f"{base_art}/mix.mp3"
+                if os.path.exists(os.path.join(job_dir, "mix.mp3")):
+                    artifacts["mix_mp3"] = f"{base_art}/mix.mp3"
             if manifest.get("ducking", {}).get("ducking_applied"):
                 artifacts["mix_ducked_wav"] = f"{base_art}/mix_ducked.wav"
                 artifacts["ducked_mix_wav"] = f"{base_art}/ducked_mix.wav"

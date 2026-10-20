@@ -60,7 +60,7 @@
 
 | Item # | Integration Standard Requirement | Status | Evidence / Verification |
 | :---: | :--- | :---: | :--- |
-| **1** | **One-command Startup & Test** | **PASS** | `docker compose up --build -d` starts stack. `python -m pytest tests/ -v` runs all 19 tests offline without API keys. `.env.example` includes all settings. |
+| **1** | **One-command Startup & Test** | **PASS** | `docker compose up --build -d` starts stack. `python -m pytest tests/ -v` runs all 28 tests offline without API keys. `.env.example` includes all settings. |
 | **2** | **Accurate OpenAPI 3.1** | **PASS** | Root-level `openapi.yaml` exported directly from FastAPI schema (OpenAPI 3.1.0). All endpoints match live API. |
 | **3** | **Background Jobs** | **PASS** | POST `/api/v1/music/jobs` returns HTTP 202 and `job_id`. Status polled via `GET /api/v1/jobs/{job_id}` with `queued`, `running`, `succeeded`, `failed` states. Callbacks signed with HMAC-SHA256 (`X-IncuBrix-Signature`). |
 | **4** | **Idempotency** | **PASS** | `Idempotency-Key` supported for all job creations. Duplicate requests return cached job; duplicate key with conflicting body returns HTTP 409 Conflict. |

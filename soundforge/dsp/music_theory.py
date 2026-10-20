@@ -43,6 +43,41 @@ PROGRESSIONS = {
     ]
 }
 
+GENRE_PROGRESSIONS = {
+    "lofi": {
+        "minor": [[2, 7, 0, 9], [0, 5, 8, 7]],
+        "major": [[2, 7, 0, 9], [0, 5, 2, 7]]
+    },
+    "ambient": {
+        "minor": [[0, 5, 3, 7], [0, 8, 5, 10]],
+        "major": [[0, 5, 9, 7], [0, 7, 5, 0]]
+    },
+    "cinematic": {
+        "minor": [[0, 8, 5, 7], [0, 10, 8, 11]],
+        "major": [[0, 7, 9, 5], [0, 8, 5, 7]]
+    },
+    "acoustic": {
+        "minor": [[0, 8, 3, 10], [0, 5, 7, 0]],
+        "major": [[0, 7, 9, 5], [0, 5, 0, 7]]
+    },
+    "corporate": {
+        "major": [[0, 7, 9, 5], [0, 5, 9, 7]],
+        "minor": [[0, 3, 5, 7]]
+    },
+    "synthwave": {
+        "minor": [[0, 8, 3, 10], [0, 5, 8, 7]],
+        "major": [[9, 5, 0, 7]]
+    },
+    "tense": {
+        "minor": [[0, 1, 0, 6], [0, 6, 8, 1]],
+        "major": [[0, 6, 5, 1]]
+    },
+    "playful": {
+        "major": [[0, 9, 2, 7], [0, 5, 7, 0]],
+        "minor": [[0, 5, 7, 0]]
+    }
+}
+
 KNOWN_ARTISTS = [
     "hans zimmer", "taylor swift", "drake", "the beatles", "beatles", "queen",
     "beethoven", "mozart", "billie eilish", "daft punk", "ed sheeran", "coldplay",
@@ -187,10 +222,14 @@ def parse_key_signature(key_str: str) -> Tuple[int, str]:
     root_midi = ROOT_PITCHES.get(root_str, 36)
     return root_midi, mode
 
-def get_chord_progression(root_midi: int, mode: str, progression_index: int = 0) -> List[Dict[str, Any]]:
-    """Return a sequence of chords with root and MIDI note voicings."""
-    progs = PROGRESSIONS.get(mode, PROGRESSIONS["major"])
-    prog = progs[progression_index % len(progs)]
+def get_chord_progression(root_midi: int, mode: str, progression_index: int = 0, genre: str = "electronic") -> List[Dict[str, Any]]:
+    """Return a sequence of chords with root and MIDI note voicings conditioned on genre."""
+    genre_progs = GENRE_PROGRESSIONS.get(genre, {}).get(mode)
+    if genre_progs:
+        prog = genre_progs[progression_index % len(genre_progs)]
+    else:
+        progs = PROGRESSIONS.get(mode, PROGRESSIONS["major"])
+        prog = progs[progression_index % len(progs)]
 
     chord_list = []
     for deg in prog:
@@ -200,12 +239,46 @@ def get_chord_progression(root_midi: int, mode: str, progression_index: int = 0)
         fifth_int = 7
         seventh_int = 11 if mode == "major" and deg in [0, 5] else 10
 
-        chord_notes = [
-            c_root_oct4,
-            c_root_oct4 + third_int,
-            c_root_oct4 + fifth_int,
-            c_root_oct4 + seventh_int
-        ]
+        if genre == "lofi":
+            chord_notes = [
+                c_root_oct4,
+                c_root_oct4 + third_int,
+                c_root_oct4 + fifth_int,
+                c_root_oct4 + seventh_int,
+                c_root_oct4 + 14
+            ]
+        elif genre == "ambient":
+            chord_notes = [
+                c_root_oct4 - 12,
+                c_root_oct4,
+                c_root_oct4 + 2,
+                c_root_oct4 + fifth_int,
+                c_root_oct4 + 12
+            ]
+        elif genre == "tense":
+            chord_notes = [
+                c_root_oct4 - 12,
+                c_root_oct4,
+                c_root_oct4 + 1,
+                c_root_oct4 + 6,
+                c_root_oct4 + seventh_int
+            ]
+        elif genre == "cinematic":
+            chord_notes = [
+                c_root_oct4 - 12,
+                c_root_oct4,
+                c_root_oct4 + third_int,
+                c_root_oct4 + fifth_int,
+                c_root_oct4 + 12
+            ]
+        else:
+            chord_notes = [
+                c_root_oct4,
+                c_root_oct4 + third_int,
+                c_root_oct4 + fifth_int,
+                c_root_oct4 + seventh_int
+            ]
+
         chord_list.append({
             "root": chord_root,
             "root_name": list(ROOT_PITCHES.keys())[list(ROOT_PITCHES.values()).index(chord_root % 12 + 36)],

@@ -18,23 +18,35 @@ def test_full_ui_and_api_workflow():
 
     # 2. Verify all UI components and IDs expected by the browser
     expected_ids = [
-        "promptInput", "durationSlider", "tempoSlider", "lufsSlider", "keySelect",
-        "loopCheck", "mp3Check", "generateBtn", "progressBox", "progressBar",
-        "stageLabel", "percentLabel", "emptyState", "resultsPanel", "renderedJobId",
-        "renderedStatus", "metricDuration", "metricSampleRate", "metricLoudness",
-        "metricPeak", "metricRecon", "mixCard", "audioMix", "downloadLinks",
-        "stemsCard", "audioDrums", "audioBass", "audioChords", "audioMelody",
-        "dlDrums", "dlBass", "dlChords", "dlMelody", "manifestCard", "manifestViewer",
-        "dlManifestLink"
+        "promptInput", "durationSlider", "durationVal",
+        "sectionEditorBox", "tempoSlider", "tempoVal",
+        "keySelect", "lufsSlider", "lufsVal",
+        "loopCheck", "mp3Check", "narrationUrlInput",
+        "narrationFileInput", "seedInput", "sampleRateSelect",
+        "generateBtn", "progressMonitor", "progressFill",
+        "progressStage", "progressPct", "progressElapsed",
+        "emptyPlaceholder", "activeResultsContainer", "errorCard",
+        "errorTitle", "errorMessage", "retryActionRow",
+        "activeJobIdText", "activeStatusPill",
+        "metricDuration", "metricSampleRate", "metricLoudness", "metricPeak", "metricRecon",
+        "audioMasterMix", "masterDownloadsGroup",
+        "btnSyncPlayAll", "channelDrums", "channelBass", "channelChords", "channelMelody",
+        "audioStemDrums", "audioStemBass", "audioStemChords", "audioStemMelody",
+        "soloDrums", "soloBass", "soloChords", "soloMelody",
+        "muteDrums", "muteBass", "muteChords", "muteMelody",
+        "dlStemDrums", "dlStemBass", "dlStemChords", "dlStemMelody",
+        "manifestCodeViewer", "dlManifestBtn",
+        "previousResultCard", "prevJobPill", "audioPrevMix", "prevDownloadLinks"
     ]
     for eid in expected_ids:
         assert f'id="{eid}"' in html, f"Missing expected ID '{eid}' in demo HTML"
     print(f"[PASS] All {len(expected_ids)} interactive UI elements verified in HTML")
 
-    # 3. Verify JavaScript status handler supports 'succeeded'
+    # 3. Verify JavaScript status handler supports 'succeeded' and State Machine
     assert "data.status === 'succeeded'" in html, "JavaScript must check for 'succeeded' status"
     assert "resolveArtifactUrl" in html, "JavaScript must have resolveArtifactUrl helper"
-    print("[PASS] JavaScript status condition and URL resolution verified")
+    assert "AppState" in html, "JavaScript must have AppState state machine"
+    print("[PASS] JavaScript status condition, state machine, and URL resolution verified")
 
     # 4. Simulate the exact form submission from submitMusicJob()
     form_payload = {

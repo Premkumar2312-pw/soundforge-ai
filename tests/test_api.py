@@ -165,14 +165,14 @@ async def test_demo_ui_page_and_contract():
 
         # Verify key display and player containers
         for container_id in [
-            'id="emptyState"', 'id="resultsPanel"', 'id="alertBox"',
-            'id="audioMix"', 'id="audioDrums"', 'id="audioBass"',
-            'id="audioChords"', 'id="audioMelody"', 'id="downloadLinks"',
-            'id="manifestViewer"', 'id="dlManifestLink"'
+            'id="emptyPlaceholder"', 'id="activeResultsContainer"', 'id="errorCard"',
+            'id="audioMasterMix"', 'id="audioStemDrums"', 'id="audioStemBass"',
+            'id="audioStemChords"', 'id="audioStemMelody"', 'id="masterDownloadsGroup"',
+            'id="manifestCodeViewer"', 'id="dlManifestBtn"'
         ]:
             assert container_id in html, f"Missing container/player: {container_id}"
 
         # Verify JavaScript polling handles both 'succeeded' and 'completed'
         assert "data.status === 'succeeded'" in html or "data.status === 'completed'" in html
         assert "resolveArtifactUrl" in html
-        assert "renderCompletedJob" in html
+        assert "renderActiveResults" in html

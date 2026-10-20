@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     # Storage settings
     STORAGE_BACKEND: str = "local"  # "local" or "s3"
     STORAGE_DIR: str = "./storage"
+    STORAGE_MAX_JOBS: int = 50
     S3_ENDPOINT_URL: Optional[str] = None
     S3_ACCESS_KEY: Optional[str] = None
     S3_SECRET_KEY: Optional[str] = None

@@ -63,10 +63,11 @@ async def execute_generation_pipeline(
     tempo = request.tempo if request.tempo is not None else prompt_meta["bpm"]
     key_str = request.key if request.key is not None else prompt_meta["key"]
     genre = prompt_meta["genre"]
+    energy = prompt_meta.get("energy", "medium")
     seed = request.seed if request.seed is not None else int(time.time() * 1000) % 100000000
 
     root_midi, mode = parse_key_signature(key_str)
-    chord_progression = get_chord_progression(root_midi, mode)
+    chord_progression = get_chord_progression(root_midi, mode, genre=genre)
     sections = calculate_sections(request.duration, request.sections, tempo, warnings=warnings)
 
     # 2. Synthesize Multi-Track Stems
@@ -79,7 +80,8 @@ async def execute_generation_pipeline(
         sections=sections,
         chord_progression=chord_progression,
         genre=genre,
-        loopability=request.loopability
+        loopability=request.loopability,
+        energy=energy
     )
     timings["generation_time_ms"] = round((time.perf_counter() - t0) * 1000, 2)
 
@@ -177,8 +179,8 @@ async def execute_generation_pipeline(
             if len(mp3_data) == 0:
                 raise RuntimeError("MP3 file decoded to 0 samples")
         except Exception as ex:
-            logger.warning(f"MP3 encoding failed: {ex}")
-            warnings.append(f"MP3 encoding failed: {ex}")
+            logger.exception(f"Requested MP3 encoding failed: {ex}")
+            raise RuntimeError(f"Requested MP3 encoding failed: {ex}")
 
     # Ducked mix if generated (save both mix_ducked.wav and ducked_mix.wav)
     if ducked_mix is not None:

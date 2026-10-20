@@ -164,6 +164,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/audio/upload:
+    post:
+      summary: Upload audio file (Alias)
+      description: Upload audio file for processing or narration.
+      operationId: upload_narration_audio_api_v1_audio_upload_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_narration_audio_api_v1_audio_upload_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/narration/upload:
+    post:
+      summary: Upload narration audio for sidechain ducking
+      description: Accepts WAV or MP3 audio up to 50 MB and returns a local narration
+        URL for use in generation requests.
+      operationId: upload_narration_audio_api_v1_narration_upload_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_narration_audio_api_v1_narration_upload_post'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/narration/files/{filename}:
+    get:
+      summary: Download or stream uploaded narration audio
+      description: Retrieves previously uploaded narration audio.
+      operationId: get_uploaded_narration_api_v1_narration_files__filename__get
+      parameters:
+      - name: filename
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Filename
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/health:
     get:
       summary: API v1 Liveness probe
@@ -210,6 +281,26 @@ paths:
                 $ref: '#/components/schemas/HealthResponse'
 components:
   schemas:
+    Body_upload_narration_audio_api_v1_audio_upload_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_upload_narration_audio_api_v1_audio_upload_post
+    Body_upload_narration_audio_api_v1_narration_upload_post:
+      properties:
+        file:
+          type: string
+          format: binary
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_upload_narration_audio_api_v1_narration_upload_post
     HTTPValidationError:
       properties:
         detail:
@@ -437,6 +528,12 @@ components:
           - type: 'null'
           title: Callback Url
           description: Webhook URL notified upon job completion
+        idempotency_key:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency Key
+          description: Client-provided idempotency key
       type: object
       required:
       - prompt
