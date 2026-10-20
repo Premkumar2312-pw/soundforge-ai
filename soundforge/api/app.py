@@ -40,7 +40,6 @@ Professional AI Background Music Engine for Video, conforming to IncuBrix Proble
 - **100% Cleared Commercial Licensing**: Zero proprietary soundfonts, samples, or restrictive weights.
     """,
     version=__version__,
-    openapi_version="3.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan
